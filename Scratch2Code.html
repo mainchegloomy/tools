@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Scratch 積木轉 C++ / C# / Python 互動教學演示平台</title>
+<title>Scratch 積木 → C++ / C# / Python 演示</title>
 <style>
   :root {
     --bg-dark: #0f172a;
@@ -13,7 +13,6 @@
     --text-muted: #94a3b8;
     --border-color: #475569;
     --accent: #38bdf8;
-    /* Scratch 3.0 Official Colors */
     --c-motion: #4C97FF;
     --c-motion-dark: #3373CC;
     --c-looks: #9966FF;
@@ -52,7 +51,6 @@
     overflow: hidden;
   }
 
-  /* Header */
   header {
     background: linear-gradient(90deg, #1e293b 0%, #0f172a 100%);
     border-bottom: 1px solid var(--border-color);
@@ -71,18 +69,18 @@
   }
 
   .brand-badge {
-    background: linear-gradient(135deg, #FFAB19, #FF661A);
+    background: linear-gradient(135deg, #FFBF00, #FF661A);
     color: #fff;
     font-weight: 800;
     padding: 6px 10px;
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 13px;
     letter-spacing: 0.5px;
     box-shadow: 0 2px 6px rgba(255, 102, 26, 0.4);
   }
 
   .brand h1 {
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 700;
     color: #fff;
   }
@@ -109,14 +107,11 @@
     background: var(--bg-card);
     color: var(--text-main);
     border: 1px solid var(--border-color);
-    padding: 6px 12px;
+    padding: 6px 11px;
     border-radius: 6px;
-    font-size: 13px;
+    font-size: 12.5px;
     cursor: pointer;
     transition: all 0.15s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
   }
 
   .btn:hover {
@@ -136,15 +131,13 @@
     color: #fff;
   }
 
-  /* Main 3-Column Workspace */
   .main-container {
     display: grid;
-    grid-template-columns: 380px 1fr 480px;
+    grid-template-columns: 390px 1fr 470px;
     flex: 1;
     overflow: hidden;
   }
 
-  /* Column 1: Block Palette */
   .palette-pane {
     background: var(--bg-panel);
     border-right: 1px solid var(--border-color);
@@ -181,7 +174,7 @@
   }
 
   .category-sidebar {
-    width: 82px;
+    width: 80px;
     background: #131c2e;
     border-right: 1px solid var(--border-color);
     padding: 8px 4px;
@@ -222,7 +215,7 @@
     width: 14px;
     height: 14px;
     border-radius: 50%;
-    border: 1.5px solid rgba(255, 255, 255, 0.3);
+    border: 1.5px solid rgba(255, 255, 255, 0.35);
   }
 
   .block-list {
@@ -231,7 +224,7 @@
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
   }
 
   .palette-group-title {
@@ -244,91 +237,298 @@
     border-bottom: 1px dashed var(--border-color);
   }
 
-  /* Scratch Block Visual Styles */
-  .s-block {
+  .scratch-block-outer {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    cursor: grab;
+    user-select: none;
+    position: relative;
+    max-width: 100%;
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.28));
+  }
+
+  .scratch-block-outer:active {
+    cursor: grabbing;
+  }
+
+  .scratch-block-outer.selected > .sb-stack,
+  .scratch-block-outer.selected > .sb-c-wrap {
+    outline: 2.5px solid #38bdf8;
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  .sb-stack {
+    position: relative;
     display: inline-flex;
     align-items: center;
     flex-wrap: wrap;
     gap: 5px;
-    padding: 7px 12px;
-    border-radius: 6px;
+    padding: 9px 14px 11px 14px;
     color: #fff;
     font-size: 13px;
     font-weight: 600;
-    cursor: grab;
-    user-select: none;
-    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.25);
-    position: relative;
-    transition: transform 0.1s, box-shadow 0.1s;
-    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
-    max-width: 100%;
-  }
-
-  .s-block:hover {
-    filter: brightness(1.06);
-  }
-
-  .s-block:active {
-    cursor: grabbing;
-    transform: scale(0.99);
-  }
-
-  .s-block.hat {
-    border-top-left-radius: 18px;
-    border-top-right-radius: 18px;
-    padding-top: 10px;
-  }
-
-  .s-block.reporter {
-    border-radius: 20px;
-    padding: 5px 12px;
-  }
-
-  .s-block.boolean {
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.22);
     border-radius: 4px;
-    clip-path: polygon(10px 0%, calc(100% - 10px) 0%, 100% 50%, calc(100% - 10px) 100%, 10px 100%, 0% 50%);
-    padding: 5px 16px;
+    min-height: 38px;
   }
 
-  .s-block.cap {
-    border-bottom-left-radius: 2px;
-    border-bottom-right-radius: 2px;
+  .sb-stack.has-top::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 16px;
+    width: 16px;
+    height: 4px;
+    background: #141d2f;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,0.35);
   }
 
-  /* Category colors */
-  .cat-motion { background-color: var(--c-motion); border: 1px solid var(--c-motion-dark); }
-  .cat-looks { background-color: var(--c-looks); border: 1px solid var(--c-looks-dark); }
-  .cat-sound { background-color: var(--c-sound); border: 1px solid var(--c-sound-dark); }
-  .cat-events { background-color: var(--c-events); border: 1px solid var(--c-events-dark); }
-  .cat-control { background-color: var(--c-control); border: 1px solid var(--c-control-dark); }
-  .cat-sensing { background-color: var(--c-sensing); border: 1px solid var(--c-sensing-dark); }
-  .cat-operators { background-color: var(--c-operators); border: 1px solid var(--c-operators-dark); }
-  .cat-variables { background-color: var(--c-variables); border: 1px solid var(--c-variables-dark); }
-  .cat-lists { background-color: var(--c-lists); border: 1px solid var(--c-lists-dark); }
-  .cat-myblocks { background-color: var(--c-myblocks); border: 1px solid var(--c-myblocks-dark); }
+  .palette-pane .sb-stack.has-top::before {
+    background: var(--bg-panel);
+  }
 
-  /* Inputs inside blocks */
+  .sb-stack.has-bottom::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 16px;
+    width: 16px;
+    height: 5px;
+    background: inherit;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+    z-index: 2;
+  }
+
+  .sb-stack.is-hat {
+    border-top-left-radius: 20px;
+    border-top-right-radius: 28px;
+    padding-top: 14px;
+    margin-top: 4px;
+  }
+
+  .sb-stack.is-cap {
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+    padding-bottom: 9px;
+  }
+
+  .sb-reporter {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 5px 14px;
+    border-radius: 999px;
+    color: #fff;
+    font-size: 12.5px;
+    font-weight: 600;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+    min-height: 28px;
+  }
+
+  .sb-boolean {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 5px 18px;
+    color: #fff;
+    font-size: 12.5px;
+    font-weight: 600;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+    min-height: 28px;
+    clip-path: polygon(12px 0%, calc(100% - 12px) 0%, 100% 50%, calc(100% - 12px) 100%, 12px 100%, 0% 50%);
+  }
+
+  .sb-c-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .sb-c-top {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 9px 14px 10px 14px;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.22);
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    min-width: 190px;
+  }
+
+  .sb-c-top::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 16px;
+    width: 16px;
+    height: 4px;
+    background: #141d2f;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+  }
+
+  .palette-pane .sb-c-top::before {
+    background: var(--bg-panel);
+  }
+
+  .sb-c-top::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 32px;
+    width: 16px;
+    height: 5px;
+    background: inherit;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+    z-index: 2;
+  }
+
+  .sb-c-mouth-row {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .sb-c-arm {
+    width: 16px;
+    flex-shrink: 0;
+  }
+
+  .sb-c-slot {
+    flex: 1;
+    min-width: 210px;
+    min-height: 40px;
+    padding: 7px 8px;
+    background: rgba(15, 23, 42, 0.42);
+    border: 1px dashed rgba(255, 255, 255, 0.35);
+    border-left: none;
+    border-radius: 0 6px 6px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .sb-c-slot.drag-over,
+  .workspace-canvas.drag-over {
+    background: rgba(56, 189, 248, 0.14);
+    border-color: #38bdf8;
+  }
+
+  .sb-c-mid {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 14px;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 0 4px 4px 0;
+    min-width: 120px;
+  }
+
+  .sb-c-mid::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 32px;
+    width: 16px;
+    height: 4px;
+    background: #141d2f;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+  }
+
+  .sb-c-mid::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 32px;
+    width: 16px;
+    height: 5px;
+    background: inherit;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+    z-index: 2;
+  }
+
+  .sb-c-bottom {
+    position: relative;
+    height: 16px;
+    min-width: 140px;
+    border-radius: 0 4px 4px 4px;
+  }
+
+  .sb-c-bottom::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 32px;
+    width: 16px;
+    height: 4px;
+    background: #141d2f;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+  }
+
+  .sb-c-bottom::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 16px;
+    width: 16px;
+    height: 5px;
+    background: inherit;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+    z-index: 2;
+  }
+
+  .col-motion { background-color: var(--c-motion); border: 1px solid var(--c-motion-dark); }
+  .col-looks { background-color: var(--c-looks); border: 1px solid var(--c-looks-dark); }
+  .col-sound { background-color: var(--c-sound); border: 1px solid var(--c-sound-dark); }
+  .col-events { background-color: var(--c-events); border: 1px solid var(--c-events-dark); }
+  .col-control { background-color: var(--c-control); border: 1px solid var(--c-control-dark); }
+  .col-sensing { background-color: var(--c-sensing); border: 1px solid var(--c-sensing-dark); }
+  .col-operators { background-color: var(--c-operators); border: 1px solid var(--c-operators-dark); }
+  .col-variables { background-color: var(--c-variables); border: 1px solid var(--c-variables-dark); }
+  .col-lists { background-color: var(--c-lists); border: 1px solid var(--c-lists-dark); }
+  .col-myblocks { background-color: var(--c-myblocks); border: 1px solid var(--c-myblocks-dark); }
+
   .b-input {
     background: #fff;
     color: #1e293b;
     border: none;
-    border-radius: 12px;
-    padding: 2px 7px;
+    border-radius: 999px;
+    padding: 2px 8px;
     font-size: 12px;
     font-weight: 700;
     min-width: 28px;
     max-width: 110px;
     text-align: center;
     outline: none;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.22);
   }
 
   .b-select {
     background: rgba(0, 0, 0, 0.18);
     color: #fff;
     border: 1px solid rgba(255, 255, 255, 0.35);
-    border-radius: 10px;
-    padding: 2px 6px;
+    border-radius: 999px;
+    padding: 2px 7px;
     font-size: 12px;
     font-weight: 600;
     outline: none;
@@ -344,21 +544,19 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 46px;
+    min-width: 48px;
     min-height: 22px;
-    background: rgba(0, 0, 0, 0.22);
-    clip-path: polygon(8px 0%, calc(100% - 8px) 0%, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0% 50%);
-    padding: 1px 10px;
+    background: rgba(0, 0, 0, 0.24);
+    clip-path: polygon(9px 0%, calc(100% - 9px) 0%, 100% 50%, calc(100% - 9px) 100%, 9px 100%, 0% 50%);
+    padding: 1px 11px;
     font-size: 11px;
-    color: rgba(255, 255, 255, 0.8);
-    border: 1px dashed rgba(255, 255, 255, 0.4);
+    color: rgba(255, 255, 255, 0.85);
   }
 
   .b-slot-bool.drag-over {
-    background: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.45);
   }
 
-  /* Column 2: Script Workspace */
   .workspace-pane {
     background-color: #141d2f;
     background-image: radial-gradient(#28354f 1px, transparent 1px);
@@ -366,7 +564,6 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    position: relative;
   }
 
   .pane-header {
@@ -394,7 +591,7 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 4px;
+    gap: 5px;
   }
 
   .workspace-empty {
@@ -414,24 +611,7 @@
     font-size: 16px;
   }
 
-  /* Workspace Block Wrapper & C-Blocks */
-  .ws-item {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    position: relative;
-    width: fit-content;
-    max-width: 100%;
-    transition: transform 0.1s;
-  }
-
-  .ws-item.selected > .s-block,
-  .ws-item.selected > .c-block-wrapper {
-    outline: 2.5px solid #38bdf8;
-    outline-offset: 2px;
-  }
-
-  .ws-block-row {
+  .ws-row {
     display: flex;
     align-items: center;
     gap: 6px;
@@ -445,7 +625,6 @@
     width: 22px;
     height: 22px;
     font-size: 12px;
-    line-height: 1;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
@@ -460,71 +639,6 @@
     color: #fff;
   }
 
-  /* C-Block (Control Structures with Mouth) */
-  .c-block-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    border-radius: 6px;
-  }
-
-  .c-block-top {
-    border-bottom-left-radius: 0;
-  }
-
-  .c-block-body {
-    display: flex;
-    align-items: stretch;
-    width: 100%;
-  }
-
-  .c-block-spine {
-    width: 16px;
-    background-color: var(--c-control);
-    border-left: 1px solid var(--c-control-dark);
-    border-right: 1px solid var(--c-control-dark);
-    flex-shrink: 0;
-  }
-
-  .c-block-inner {
-    min-height: 38px;
-    min-width: 210px;
-    padding: 6px 8px;
-    background: rgba(15, 23, 42, 0.45);
-    border: 1px dashed rgba(255, 171, 25, 0.45);
-    border-left: none;
-    border-radius: 0 6px 6px 0;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    flex: 1;
-  }
-
-  .c-block-inner.drag-over,
-  .workspace-canvas.drag-over {
-    background: rgba(56, 189, 248, 0.12);
-    border-color: #38bdf8;
-  }
-
-  .c-block-mid {
-    background-color: var(--c-control);
-    border: 1px solid var(--c-control-dark);
-    color: #fff;
-    font-size: 13px;
-    font-weight: 700;
-    padding: 5px 14px;
-    min-width: 120px;
-  }
-
-  .c-block-bottom {
-    background-color: var(--c-control);
-    border: 1px solid var(--c-control-dark);
-    height: 14px;
-    min-width: 140px;
-    border-radius: 0 6px 6px 6px;
-    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.25);
-  }
-
   .drop-placeholder {
     font-size: 11px;
     color: var(--text-muted);
@@ -532,7 +646,6 @@
     pointer-events: none;
   }
 
-  /* Column 3: Code Output & Explanation */
   .code-pane {
     background: var(--bg-panel);
     border-left: 1px solid var(--border-color);
@@ -627,20 +740,16 @@
     color: #e2e8f0;
   }
 
-  /* Syntax Highlighting */
   .tok-kw { color: #c084fc; font-weight: 600; }
   .tok-type { color: #38bdf8; }
   .tok-str { color: #4ade80; }
-  .tok-num { color: #fb923c; }
   .tok-com { color: #64748b; font-style: italic; }
-  .tok-fn { color: #facc15; }
 
-  /* Concept Explanation Card */
   .concept-card {
     background: #162032;
     border-top: 1px solid var(--border-color);
     padding: 14px 16px;
-    max-height: 220px;
+    max-height: 210px;
     overflow-y: auto;
     flex-shrink: 0;
   }
@@ -656,9 +765,6 @@
     font-size: 13px;
     font-weight: 700;
     color: var(--accent);
-    display: flex;
-    align-items: center;
-    gap: 6px;
   }
 
   .concept-tag {
@@ -684,39 +790,32 @@
     font-size: 12px;
     border-radius: 0 4px 4px 0;
   }
-
-  @media (max-width: 1150px) {
-    .main-container {
-      grid-template-columns: 320px 1fr 380px;
-    }
-  }
 </style>
 </head>
 <body>
 
 <header>
   <div class="brand">
-    <div class="brand-badge">SCRATCH → CODE</div>
+    <div class="brand-badge">SCRATCH 3.0</div>
     <div>
-      <h1>Scratch 全積木轉 C++ / C# / Python 互動教學演示平台</h1>
-      <p>拖曳或點擊左側積木堆積程式，右側即時轉換三種語言並同步解析語法觀念</p>
+      <h1>Scratch 積木 → C++ / C# / Python 演示</h1>
+      <p>使用 Scratch 3.0 積木官方色票</p>
     </div>
   </div>
   <div class="preset-bar">
-    <span class="preset-label">課堂範例：</span>
+    <span class="preset-label">範例：</span>
     <button class="btn" onclick="loadPreset('ifElse')">分支判斷</button>
     <button class="btn" onclick="loadPreset('loopSum')">迴圈累加</button>
     <button class="btn" onclick="loadPreset('listDemo')">清單操作</button>
     <button class="btn" onclick="loadPreset('cloneDemo')">分身機制</button>
-    <button class="btn btn-danger" onclick="clearWorkspace()">清空工作區</button>
+    <button class="btn btn-danger" onclick="clearWorkspace()">清空</button>
   </div>
 </header>
 
 <div class="main-container">
-  <!-- Left: Palette -->
   <section class="palette-pane">
     <div class="search-box">
-      <input type="text" id="searchInput" placeholder="搜尋積木（例如：分身、隨機、清單、while、移動）..." oninput="renderPalette()">
+      <input type="text" id="searchInput" placeholder="搜尋積木（分身、隨機、清單、移動、如果）..." oninput="renderPalette()">
     </div>
     <div class="palette-body">
       <div class="category-sidebar" id="categorySidebar"></div>
@@ -724,10 +823,9 @@
     </div>
   </section>
 
-  <!-- Center: Workspace -->
   <section class="workspace-pane">
     <div class="pane-header">
-      <span>積木程式堆積區 <span class="pane-subtitle">（可拖曳至主畫布或控制積木凹槽內，點擊積木可檢視解說）</span></span>
+      <span>積木程式堆積區 <span class="pane-subtitle">（拖曳至畫布或 C 型積木凹槽內，點擊積木查看解說）</span></span>
       <span class="pane-subtitle" id="blockCountLabel">0 個積木</span>
     </div>
     <div class="workspace-canvas" id="workspaceCanvas"
@@ -737,32 +835,30 @@
     </div>
   </section>
 
-  <!-- Right: Code & Concept -->
   <section class="code-pane">
     <div class="lang-tabs">
       <button class="lang-btn active" id="btn-cpp" onclick="setLanguage('cpp')">C++</button>
       <button class="lang-btn" id="btn-cs" onclick="setLanguage('cs')">C#</button>
       <button class="lang-btn" id="btn-py" onclick="setLanguage('py')">Python</button>
-      <button class="copy-btn" id="copyBtn" onclick="copyCode()">複製程式碼</button>
+      <button class="copy-btn" id="copyBtn" onclick="copyCode()">複製</button>
     </div>
     <div class="code-viewer" id="codeViewer"></div>
-    <div class="concept-card" id="conceptCard">
+    <div class="concept-card">
       <div class="concept-header">
         <div class="concept-title" id="conceptTitle">💡 點選或滑過積木查看觀念解析</div>
         <span class="concept-tag" id="conceptCategory">教學提示</span>
       </div>
       <div class="concept-body" id="conceptBody">
-        在左側點選或拖曳任何 Scratch 積木到中間工作區，即可觀察它在 C++、C# 與 Python 中的對應寫法。
+        在左側點選或拖曳任何原版造型的 Scratch 積木到中間工作區，即可觀察它在 C++、C# 與 Python 中的對應寫法。
       </div>
       <div class="concept-tip" id="conceptTip">
-        提示：控制類積木（如「重複 N 次」、「如果...那麼」）擁有凹槽，可直接把其他積木拖進凹槽內，觀察大括號 { } 與縮排的對應關係！
+        提示：C 型積木（如「重複 N 次」、「如果...那麼」）的凹槽可直接放入其他積木，六角形插槽可放入布林條件積木。
       </div>
     </div>
   </section>
 </div>
 
 <script>
-// 1. Categories Definition
 const CATEGORIES = [
   { id: 'all', name: '全部', color: '#38bdf8' },
   { id: 'motion', name: '動作', color: '#4C97FF' },
@@ -777,14 +873,12 @@ const CATEGORIES = [
   { id: 'myblocks', name: '函式', color: '#FF6680' }
 ];
 
-// 2. Full Block Definitions parsed from project.json (All 9 Categories)
 const BLOCK_DEFS = {
-  // === MOTION (動作) ===
   motion_movesteps: {
     cat: 'motion', shape: 'stack', label: '移動 {STEPS} 點',
     params: { STEPS: { type: 'num', val: '10' } },
-    concept: '文字型程式語言本身沒有「角色座標」，通常會用變數 x, y 搭配三角函數（cos / sin）更新位置。',
-    tip: 'C++ 與 C# 的 cos() 接收的是「弧度（Radian）」而非角度，需先乘以 PI / 180。',
+    concept: '文字型程式語言沒有「角色座標」，通常會用變數 x, y 搭配三角函數（cos / sin）更新位置。',
+    tip: 'C++ 與 C# 的 cos() 接收的是弧度（Radian），需先乘以 PI / 180。',
     code: {
       cpp: p => `x += ${p.STEPS} * cos(direction * M_PI / 180.0); y += ${p.STEPS} * sin(direction * M_PI / 180.0);`,
       cs: p => `x += ${p.STEPS} * Math.Cos(direction * Math.PI / 180.0); y += ${p.STEPS} * Math.Sin(direction * Math.PI / 180.0);`,
@@ -794,8 +888,8 @@ const BLOCK_DEFS = {
   motion_turnright: {
     cat: 'motion', shape: 'stack', label: '右轉 ↻ {DEGREES} 度',
     params: { DEGREES: { type: 'num', val: '15' } },
-    concept: '角度旋轉本質上是對儲存方向角度的變數進行加法或減法更新。',
-    tip: '使用 += 複合指定運算子可以簡潔地累加數值。',
+    concept: '角度旋轉本質上是對方向角度變數進行加法更新。',
+    tip: '使用 += 複合指定運算子可簡潔地累加數值。',
     code: {
       cpp: p => `direction += ${p.DEGREES};`,
       cs: p => `direction += ${p.DEGREES};`,
@@ -805,8 +899,8 @@ const BLOCK_DEFS = {
   motion_turnleft: {
     cat: 'motion', shape: 'stack', label: '左轉 ↺ {DEGREES} 度',
     params: { DEGREES: { type: 'num', val: '15' } },
-    concept: '向左旋轉對應角度變數的遞減運算。',
-    tip: '若要限制角度在 0~360 之間，通常會搭配取餘數（% 360）。',
+    concept: '向左旋轉對應方向角度變數的減法更新。',
+    tip: '若要限制角度在 0~360 之間，可搭配取餘數（% 360）。',
     code: {
       cpp: p => `direction -= ${p.DEGREES};`,
       cs: p => `direction -= ${p.DEGREES};`,
@@ -816,7 +910,7 @@ const BLOCK_DEFS = {
   motion_goto: {
     cat: 'motion', shape: 'stack', label: '定位到 {TO}',
     params: { TO: { type: 'select', val: '_random_', options: [['_random_', '隨機位置'], ['_mouse_', '鼠標位置']] } },
-    concept: '將角色移動到特定目標位置，實務上就是同時修改 x 與 y 兩個座標變數。',
+    concept: '同時更新 x 與 y 兩個座標變數。',
     tip: 'Scratch 舞台 X 範圍是 -240~240，Y 範圍是 -180~180。',
     code: {
       cpp: p => p.TO === '_random_' ? `x = rand() % 481 - 240; y = rand() % 361 - 180;` : `x = mouseX; y = mouseY;`,
@@ -827,8 +921,8 @@ const BLOCK_DEFS = {
   motion_gotoxy: {
     cat: 'motion', shape: 'stack', label: '定位到 x:{X} y:{Y}',
     params: { X: { type: 'num', val: '0' }, Y: { type: 'num', val: '0' } },
-    concept: '直接對 x 與 y 兩個狀態變數進行賦值（Assignment）。',
-    tip: 'Python 支援「多重賦值」語法 x, y = 0, 0，一行就能同時設定兩個變數。',
+    concept: '直接對 x 與 y 兩個狀態變數進行賦值。',
+    tip: 'Python 支援多重賦值 x, y = 0, 0。',
     code: {
       cpp: p => `x = ${p.X}; y = ${p.Y};`,
       cs: p => `x = ${p.X}; y = ${p.Y};`,
@@ -838,10 +932,10 @@ const BLOCK_DEFS = {
   motion_glideto: {
     cat: 'motion', shape: 'stack', label: '在 {SECS} 秒內滑行到 {TO}',
     params: { SECS: { type: 'num', val: '1' }, TO: { type: 'select', val: '_random_', options: [['_random_', '隨機位置'], ['_mouse_', '鼠標位置']] } },
-    concept: '「滑行」在遊戲引擎中稱為線性插值（Lerp），隨時間逐步改變座標，而非瞬間移動。',
-    tip: '在純文字程式中通常會包裝成一個帶有時間參數的函式 glideTo()。',
+    concept: '隨時間逐步改變座標，而非瞬間移動。',
+    tip: '在純文字程式中通常會包裝成一個帶時間參數的函式。',
     code: {
-      cpp: p => `glideTo(${p.SECS}, "${p.TO}"); // 隨時間線性插值更新座標`,
+      cpp: p => `glideTo(${p.SECS}, "${p.TO}");`,
       cs: p => `await GlideToAsync(${p.SECS}, "${p.TO}");`,
       py: p => `glide_to(${p.SECS}, "${p.TO}")`
     }
@@ -861,7 +955,7 @@ const BLOCK_DEFS = {
     cat: 'motion', shape: 'stack', label: '面朝 {DIRECTION} 度',
     params: { DIRECTION: { type: 'num', val: '90' } },
     concept: '直接設定方向角度變數（Scratch 預設 90 度為朝右）。',
-    tip: '數學極座標通常以 0 度朝右、逆時針為正；Scratch 則是 0 度朝上、順時針為正。',
+    tip: 'Scratch 0 度朝上、順時針為正；數學極座標通常 0 度朝右、逆時針為正。',
     code: {
       cpp: p => `direction = ${p.DIRECTION};`,
       cs: p => `direction = ${p.DIRECTION};`,
@@ -871,7 +965,7 @@ const BLOCK_DEFS = {
   motion_pointtowards: {
     cat: 'motion', shape: 'stack', label: '面朝 {TOWARDS} 向',
     params: { TOWARDS: { type: 'select', val: '_mouse_', options: [['_mouse_', '鼠標']] } },
-    concept: '計算兩點之間的夾角，在程式中通常使用反三角函數 atan2(dy, dx)。',
+    concept: '計算兩點之間的夾角，通常使用反三角函數 atan2(dy, dx)。',
     tip: 'atan2(y2 - y1, x2 - x1) 是遊戲開發計算角色朝向目標角度的標準公式。',
     code: {
       cpp: p => `direction = atan2(mouseY - y, mouseX - x) * 180.0 / M_PI;`,
@@ -882,7 +976,7 @@ const BLOCK_DEFS = {
   motion_changexby: {
     cat: 'motion', shape: 'stack', label: 'x 改變 {DX}',
     params: { DX: { type: 'num', val: '10' } },
-    concept: '水平座標累加，對應到變數的 += 運算。',
+    concept: '水平座標累加，對應到 x += dx。',
     tip: '正數向右移動，負數向左移動。',
     code: {
       cpp: p => `x += ${p.DX};`,
@@ -894,7 +988,7 @@ const BLOCK_DEFS = {
     cat: 'motion', shape: 'stack', label: 'x 設為 {X}',
     params: { X: { type: 'num', val: '0' } },
     concept: '直接指定水平座標 x 的新數值。',
-    tip: '注意單等號 = 是「設為（賦值）」，雙等號 == 才是「比較是否相等」。',
+    tip: '單等號 = 是賦值（設為），雙等號 == 才是比較相等。',
     code: {
       cpp: p => `x = ${p.X};`,
       cs: p => `x = ${p.X};`,
@@ -905,7 +999,7 @@ const BLOCK_DEFS = {
     cat: 'motion', shape: 'stack', label: 'y 改變 {DY}',
     params: { DY: { type: 'num', val: '10' } },
     concept: '垂直座標累加，對應到 y += dy。',
-    tip: '在許多 2D 視窗座標系（如 HTML Canvas、Pygame）中，Y 軸向下為正，與 Scratch 向上為正相反。',
+    tip: '許多 2D 視窗座標系中 Y 軸向下為正，與 Scratch 向上為正相反。',
     code: {
       cpp: p => `y += ${p.DY};`,
       cs: p => `y += ${p.DY};`,
@@ -916,7 +1010,7 @@ const BLOCK_DEFS = {
     cat: 'motion', shape: 'stack', label: 'y 設為 {Y}',
     params: { Y: { type: 'num', val: '0' } },
     concept: '直接指定垂直座標 y 的新數值。',
-    tip: '設定座標後，畫面通常要等到下一次重繪（Render）才會更新角色位置。',
+    tip: '設定座標後通常要等下一次重繪才會更新顯示位置。',
     code: {
       cpp: p => `y = ${p.Y};`,
       cs: p => `y = ${p.Y};`,
@@ -926,8 +1020,8 @@ const BLOCK_DEFS = {
   motion_ifonedgebounce: {
     cat: 'motion', shape: 'stack', label: '碰到邊緣就反彈',
     params: {},
-    concept: '這其實是一個隱藏的條件判斷（if）：檢查 x 或 y 是否超出舞台邊界，若超出則將速度或角度反轉。',
-    tip: '在遊戲程式中通常寫成：if (x > 240 || x < -240) vx = -vx;',
+    concept: '檢查座標是否超出舞台邊界，若超出則反轉方向或速度。',
+    tip: '本質上是隱藏的 if 條件判斷。',
     code: {
       cpp: () => `if (x > 240 || x < -240) direction = -direction;`,
       cs: () => `if (x > 240 || x < -240) direction = -direction;`,
@@ -937,8 +1031,8 @@ const BLOCK_DEFS = {
   motion_setrotationstyle: {
     cat: 'motion', shape: 'stack', label: '迴轉方式設為 {STYLE}',
     params: { STYLE: { type: 'select', val: 'left-right', options: [['left-right', '左-右'], ["don't rotate", '不旋轉'], ['all around', '不設限']] } },
-    concept: '設定角色貼圖翻轉或旋轉的渲染模式，通常用字串或列舉（Enum）變數記錄。',
-    tip: 'C# 和 C++ 常會使用 enum（列舉）來表示有限的幾種狀態選項。',
+    concept: '設定角色貼圖翻轉或旋轉的渲染模式。',
+    tip: 'C# 與 C++ 常使用 enum（列舉）表示有限的幾種選項。',
     code: {
       cpp: p => `rotationStyle = "${p.STYLE}";`,
       cs: p => `rotationStyle = "${p.STYLE}";`,
@@ -948,33 +1042,32 @@ const BLOCK_DEFS = {
   motion_xposition: {
     cat: 'motion', shape: 'reporter', label: 'x 座標',
     params: {},
-    concept: '圓角積木代表「回傳值（變數或運算結果）」，可直接讀取變數 x 的值。',
-    tip: '在運算式或條件判斷中，直接寫變數名稱 x 即可取得它的值。',
+    concept: '圓角回報值積木：直接讀取變數 x 的值。',
+    tip: '可直接放入運算式或條件判斷中。',
     code: { cpp: () => `x`, cs: () => `x`, py: () => `x` }
   },
   motion_yposition: {
     cat: 'motion', shape: 'reporter', label: 'y 座標',
     params: {},
-    concept: '讀取目前角色的垂直座標變數 y。',
-    tip: '圓角回報積木在文字語言裡就是一個「表達式（Expression）」。',
+    concept: '圓角回報值積木：直接讀取變數 y 的值。',
+    tip: '在文字語言裡就是一個表達式（Expression）。',
     code: { cpp: () => `y`, cs: () => `y`, py: () => `y` }
   },
   motion_direction: {
     cat: 'motion', shape: 'reporter', label: '方向',
     params: {},
-    concept: '讀取目前角色的方向角度變數 direction。',
-    tip: '可直接放入大於、小於或加減乘除的運算式中。',
+    concept: '圓角回報值積木：讀取目前方向角度變數 direction。',
+    tip: '可用於角度計算或條件比對。',
     code: { cpp: () => `direction`, cs: () => `direction`, py: () => `direction` }
   },
 
-  // === LOOKS (外觀) ===
   looks_sayforsecs: {
     cat: 'looks', shape: 'stack', label: '說出 {MESSAGE} 持續 {SECS} 秒',
     params: { MESSAGE: { type: 'text', val: 'Hello!' }, SECS: { type: 'num', val: '2' } },
-    concept: '在文字介面程式中，「說出」對應到標準輸出（Console Output），並暫停指定秒數。',
-    tip: '字串資料在 C++、C#、Python 中都必須用雙引號 " " 包起來。',
+    concept: '印出文字訊息到主控台並暫停指定秒數。',
+    tip: '字串在 C++、C#、Python 中都必須用雙引號 " " 包起來。',
     code: {
-      cpp: p => `std::cout << "${p.MESSAGE}" << std::endl; std::this_thread::sleep_for(std::chrono::seconds(${p.SECS}));`,
+      cpp: p => `cout << "${p.MESSAGE}" << endl; this_thread::sleep_for(chrono::seconds(${p.SECS}));`,
       cs: p => `Console.WriteLine("${p.MESSAGE}"); Thread.Sleep(${p.SECS} * 1000);`,
       py: p => `print("${p.MESSAGE}"); time.sleep(${p.SECS})`
     }
@@ -982,10 +1075,10 @@ const BLOCK_DEFS = {
   looks_say: {
     cat: 'looks', shape: 'stack', label: '說出 {MESSAGE}',
     params: { MESSAGE: { type: 'text', val: 'Hello!' } },
-    concept: '將文字訊息印出到螢幕上，這是學任何程式語言的第一步（Hello World）。',
-    tip: 'C++ 用 std::cout、C# 用 Console.WriteLine()、Python 用 print()。',
+    concept: '將文字訊息輸出到螢幕。',
+    tip: 'C++ 用 cout、C# 用 Console.WriteLine()、Python 用 print()。',
     code: {
-      cpp: p => `std::cout << "${p.MESSAGE}" << std::endl;`,
+      cpp: p => `cout << "${p.MESSAGE}" << endl;`,
       cs: p => `Console.WriteLine("${p.MESSAGE}");`,
       py: p => `print("${p.MESSAGE}")`
     }
@@ -993,10 +1086,10 @@ const BLOCK_DEFS = {
   looks_thinkforsecs: {
     cat: 'looks', shape: 'stack', label: '思考 {MESSAGE} 持續 {SECS} 秒',
     params: { MESSAGE: { type: 'text', val: 'Hmm...' }, SECS: { type: 'num', val: '2' } },
-    concept: '輸出思考狀態訊息並等待指定秒數。',
-    tip: '在圖形介面中只是對話框樣式不同，邏輯上同樣是顯示文字加計時。',
+    concept: '輸出思考訊息並等待指定秒數。',
+    tip: '邏輯上是文字輸出搭配時間延遲。',
     code: {
-      cpp: p => `std::cout << "[思考] ${p.MESSAGE}" << std::endl; sleep(${p.SECS});`,
+      cpp: p => `cout << "[思考] ${p.MESSAGE}" << endl; sleep(${p.SECS});`,
       cs: p => `Console.WriteLine("[思考] ${p.MESSAGE}"); Thread.Sleep(${p.SECS} * 1000);`,
       py: p => `print("[思考] ${p.MESSAGE}"); time.sleep(${p.SECS})`
     }
@@ -1004,10 +1097,10 @@ const BLOCK_DEFS = {
   looks_think: {
     cat: 'looks', shape: 'stack', label: '思考 {MESSAGE}',
     params: { MESSAGE: { type: 'text', val: 'Hmm...' } },
-    concept: '在主控台印出思考訊息。',
-    tip: '字串拼接或格式化輸出在三種語言中都非常常用。',
+    concept: '印出思考狀態文字。',
+    tip: '常與字串格式化搭配使用。',
     code: {
-      cpp: p => `std::cout << "[思考] ${p.MESSAGE}" << std::endl;`,
+      cpp: p => `cout << "[思考] ${p.MESSAGE}" << endl;`,
       cs: p => `Console.WriteLine("[思考] ${p.MESSAGE}");`,
       py: p => `print("[思考] ${p.MESSAGE}")`
     }
@@ -1015,8 +1108,8 @@ const BLOCK_DEFS = {
   looks_switchcostumeto: {
     cat: 'looks', shape: 'stack', label: '造型換成 {COSTUME}',
     params: { COSTUME: { type: 'text', val: 'costume1' } },
-    concept: '切換角色目前的圖片索引或名稱，在遊戲開發中稱為切換精靈圖（Sprite）。',
-    tip: '通常會用陣列存放所有造型，再用變數記錄目前使用哪一張。',
+    concept: '切換角色目前的圖片名稱或索引。',
+    tip: '通常會搭配陣列與索引變數管理多張造型圖片。',
     code: {
       cpp: p => `currentCostume = "${p.COSTUME}";`,
       cs: p => `currentCostume = "${p.COSTUME}";`,
@@ -1026,8 +1119,8 @@ const BLOCK_DEFS = {
   looks_nextcostume: {
     cat: 'looks', shape: 'stack', label: '下一個造型',
     params: {},
-    concept: '將造型編號加 1，若超過總數則回到第一張（利用取餘數 % 實現循環）。',
-    tip: '(index + 1) % total 是程式設計中最經典的「循環輪播」寫法！',
+    concept: '利用取餘數 % 讓造型編號循環切換。',
+    tip: '(index + 1) % total 是循環輪播的經典寫法。',
     code: {
       cpp: () => `costumeIndex = (costumeIndex + 1) % totalCostumes;`,
       cs: () => `costumeIndex = (costumeIndex + 1) % totalCostumes;`,
@@ -1037,8 +1130,8 @@ const BLOCK_DEFS = {
   looks_switchbackdropto: {
     cat: 'looks', shape: 'stack', label: '背景換成 {BACKDROP}',
     params: { BACKDROP: { type: 'text', val: 'backdrop1' } },
-    concept: '切換遊戲關卡或場景背景，通常對應到場景狀態變數（Scene / Backdrop）。',
-    tip: '大型遊戲常會用「狀態機（State Machine）」管理不同背景與關卡。',
+    concept: '切換舞台或關卡背景狀態。',
+    tip: '遊戲中常以狀態變數控制不同關卡場景。',
     code: {
       cpp: p => `currentBackdrop = "${p.BACKDROP}";`,
       cs: p => `currentBackdrop = "${p.BACKDROP}";`,
@@ -1048,8 +1141,8 @@ const BLOCK_DEFS = {
   looks_nextbackdrop: {
     cat: 'looks', shape: 'stack', label: '下一個背景',
     params: {},
-    concept: '同樣使用取餘數運算 % 讓背景索引循環切換到下一張。',
-    tip: '陣列索引從 0 開始，所以取餘數剛好落在 0 到 total-1 之間。',
+    concept: '透過取餘數 % 讓背景索引循環前進。',
+    tip: '陣列索引從 0 開始。',
     code: {
       cpp: () => `backdropIndex = (backdropIndex + 1) % totalBackdrops;`,
       cs: () => `backdropIndex = (backdropIndex + 1) % totalBackdrops;`,
@@ -1059,8 +1152,8 @@ const BLOCK_DEFS = {
   looks_changesizeby: {
     cat: 'looks', shape: 'stack', label: '尺寸改變 {CHANGE}',
     params: { CHANGE: { type: 'num', val: '10' } },
-    concept: '累加縮放比例變數（預設 100 代表 100% 原始大小）。',
-    tip: '在繪圖引擎中，繪製圖片時會將寬高乘上 (size / 100.0)。',
+    concept: '累加縮放比例變數（預設 100 為原大小）。',
+    tip: '繪製時通常會將寬高乘上 (size / 100.0)。',
     code: {
       cpp: p => `size += ${p.CHANGE};`,
       cs: p => `size += ${p.CHANGE};`,
@@ -1071,7 +1164,7 @@ const BLOCK_DEFS = {
     cat: 'looks', shape: 'stack', label: '尺寸設為 {SIZE} %',
     params: { SIZE: { type: 'num', val: '100' } },
     concept: '直接設定縮放百分比變數。',
-    tip: '100 代表原尺寸，50 代表縮小一半，200 代表放大兩倍。',
+    tip: '100 代表 100% 原始尺寸。',
     code: {
       cpp: p => `size = ${p.SIZE};`,
       cs: p => `size = ${p.SIZE};`,
@@ -1081,8 +1174,8 @@ const BLOCK_DEFS = {
   looks_changeeffectby: {
     cat: 'looks', shape: 'stack', label: '圖像效果 {EFFECT} 改變 {CHANGE}',
     params: { EFFECT: { type: 'select', val: 'COLOR', options: [['COLOR', '顏色'], ['GHOST', '幻影'], ['BRIGHTNESS', '亮度']] }, CHANGE: { type: 'num', val: '25' } },
-    concept: '修改著色器（Shader）或圖像濾鏡參數，如色相偏移或透明度（Alpha）。',
-    tip: '「幻影」效果在程式中通常對應透明度（Opacity / Alpha）。',
+    concept: '修改顏色、透明度或亮度等視覺特效參數。',
+    tip: '幻影效果在程式中常對應透明度（Alpha / Opacity）。',
     code: {
       cpp: p => `effects["${p.EFFECT}"] += ${p.CHANGE};`,
       cs: p => `effects["${p.EFFECT}"] += ${p.CHANGE};`,
@@ -1092,8 +1185,8 @@ const BLOCK_DEFS = {
   looks_seteffectto: {
     cat: 'looks', shape: 'stack', label: '圖像效果 {EFFECT} 設為 {VALUE}',
     params: { EFFECT: { type: 'select', val: 'COLOR', options: [['COLOR', '顏色'], ['GHOST', '幻影'], ['BRIGHTNESS', '亮度']] }, VALUE: { type: 'num', val: '0' } },
-    concept: '將指定的圖像濾鏡效果設定為特定數值。',
-    tip: '這裡使用字典（Map / Dictionary）用效果名稱當作鍵（Key）來存數值。',
+    concept: '直接設定指定圖像特效的數值。',
+    tip: '使用字典（Map / Dictionary）以效果名稱為鍵值儲存。',
     code: {
       cpp: p => `effects["${p.EFFECT}"] = ${p.VALUE};`,
       cs: p => `effects["${p.EFFECT}"] = ${p.VALUE};`,
@@ -1103,8 +1196,8 @@ const BLOCK_DEFS = {
   looks_cleargraphiceffects: {
     cat: 'looks', shape: 'stack', label: '圖像效果清除',
     params: {},
-    concept: '清空所有圖像特效數值，讓角色恢復原始外觀。',
-    tip: 'clear() 是三大語言容器清空資料的共通方法名稱。',
+    concept: '清除所有圖像濾鏡特效。',
+    tip: 'clear() 是清空容器資料的常見方法。',
     code: {
       cpp: () => `effects.clear();`,
       cs: () => `effects.Clear();`,
@@ -1114,30 +1207,22 @@ const BLOCK_DEFS = {
   looks_show: {
     cat: 'looks', shape: 'stack', label: '顯示',
     params: {},
-    concept: '將布林（Boolean）可見狀態變數設為 true，繪圖迴圈才會把角色畫出來。',
-    tip: '布林值只有 true（真）與 false（假），在 Python 中首字必須大寫（True / False）。',
-    code: {
-      cpp: () => `visible = true;`,
-      cs: () => `visible = true;`,
-      py: () => `visible = True`
-    }
+    concept: '將可見布林變數設為 true。',
+    tip: 'Python 的布林值首字大寫為 True / False。',
+    code: { cpp: () => `visible = true;`, cs: () => `visible = true;`, py: () => `visible = True` }
   },
   looks_hide: {
     cat: 'looks', shape: 'stack', label: '隱藏',
     params: {},
-    concept: '將可見狀態變數設為 false，跳過繪製步驟（但角色座標仍存在於記憶體中）。',
-    tip: '隱藏的角色依然可以執行程式計算，只是不會畫在螢幕上。',
-    code: {
-      cpp: () => `visible = false;`,
-      cs: () => `visible = false;`,
-      py: () => `visible = False`
-    }
+    concept: '將可見布林變數設為 false，隱藏畫面上的角色。',
+    tip: '隱藏後變數與座標資料仍保留在記憶體中。',
+    code: { cpp: () => `visible = false;`, cs: () => `visible = false;`, py: () => `visible = False` }
   },
   looks_gotofrontback: {
     cat: 'looks', shape: 'stack', label: '圖層移到 {FRONT_BACK}',
     params: { FRONT_BACK: { type: 'select', val: 'front', options: [['front', '最上層'], ['back', '最下層']] } },
-    concept: '調整渲染順序（Z-Order / Layer），決定誰畫在前面、誰被遮住。',
-    tip: '2D 遊戲通常依 Z-index 從小到大排序後依序繪製。',
+    concept: '調整圖層前後順序（Z-Order）。',
+    tip: '決定誰畫在前面、誰被遮住。',
     code: {
       cpp: p => p.FRONT_BACK === 'front' ? `layerOrder = maxLayer;` : `layerOrder = 0;`,
       cs: p => p.FRONT_BACK === 'front' ? `layerOrder = maxLayer;` : `layerOrder = 0;`,
@@ -1147,8 +1232,8 @@ const BLOCK_DEFS = {
   looks_goforwardbackwardlayers: {
     cat: 'looks', shape: 'stack', label: '圖層 {FORWARD_BACKWARD} 移 {NUM} 層',
     params: { FORWARD_BACKWARD: { type: 'select', val: 'forward', options: [['forward', '上'], ['backward', '下']] }, NUM: { type: 'num', val: '1' } },
-    concept: '對圖層順序變數進行增減。',
-    tip: '三元運算子（? :）在 C++ 與 C# 中可在一行內完成條件選值。',
+    concept: '對圖層順序數值進行增減。',
+    tip: '向上移增加圖層值，向下移減少圖層值。',
     code: {
       cpp: p => `layerOrder ${p.FORWARD_BACKWARD === 'forward' ? '+=' : '-='} ${p.NUM};`,
       cs: p => `layerOrder ${p.FORWARD_BACKWARD === 'forward' ? '+=' : '-='} ${p.NUM};`,
@@ -1158,8 +1243,8 @@ const BLOCK_DEFS = {
   looks_costumenumbername: {
     cat: 'looks', shape: 'reporter', label: '造型 {NUMBER_NAME}',
     params: { NUMBER_NAME: { type: 'select', val: 'number', options: [['number', '編號'], ['name', '名稱']] } },
-    concept: '回傳目前造型的編號或字串名稱。',
-    tip: '注意 Scratch 編號從 1 開始，而 C++/C#/Python 陣列索引通常從 0 開始！',
+    concept: '回傳目前造型的編號或名稱。',
+    tip: 'Scratch 編號從 1 開始，程式陣列索引通常從 0 開始。',
     code: {
       cpp: p => p.NUMBER_NAME === 'number' ? `(costumeIndex + 1)` : `currentCostume`,
       cs: p => p.NUMBER_NAME === 'number' ? `(costumeIndex + 1)` : `currentCostume`,
@@ -1169,8 +1254,8 @@ const BLOCK_DEFS = {
   looks_backdropnumbername: {
     cat: 'looks', shape: 'reporter', label: '背景 {NUMBER_NAME}',
     params: { NUMBER_NAME: { type: 'select', val: 'number', options: [['number', '編號'], ['name', '名稱']] } },
-    concept: '回傳目前舞台背景的編號或名稱。',
-    tip: '回報積木可直接作為條件判斷的依據（例如：如果 背景編號 == 2）。',
+    concept: '回傳目前背景編號或名稱。',
+    tip: '可用於關卡判斷。',
     code: {
       cpp: p => p.NUMBER_NAME === 'number' ? `(backdropIndex + 1)` : `currentBackdrop`,
       cs: p => p.NUMBER_NAME === 'number' ? `(backdropIndex + 1)` : `currentBackdrop`,
@@ -1180,19 +1265,18 @@ const BLOCK_DEFS = {
   looks_size: {
     cat: 'looks', shape: 'reporter', label: '尺寸',
     params: {},
-    concept: '讀取角色目前的縮放尺寸百分比變數。',
-    tip: '可直接放進運算積木中計算碰撞框大小。',
+    concept: '讀取目前縮放尺寸百分比。',
+    tip: '回報值積木可直接嵌入數值運算中。',
     code: { cpp: () => `size`, cs: () => `size`, py: () => `size` }
   },
 
-  // === SOUND (音效) ===
   sound_playuntildone: {
     cat: 'sound', shape: 'stack', label: '播放音效 {SOUND} 直到結束',
     params: { SOUND: { type: 'text', val: 'Meow' } },
-    concept: '「同步（Blocking）」播放音效：程式會停在這一行等待聲音播完才往下執行。',
-    tip: '在 UI 或遊戲程式中，同步等待太久可能會造成畫面卡住，因此通常只用於過場音效。',
+    concept: '同步播放音效：等待音效播放完畢才往下執行。',
+    tip: '會阻塞後續程式直到聲音結束。',
     code: {
-      cpp: p => `playSoundSync("${p.SOUND}"); // 阻塞直到播放完畢`,
+      cpp: p => `playSoundSync("${p.SOUND}");`,
       cs: p => `player.PlaySync(); // "${p.SOUND}"`,
       py: p => `play_sound("${p.SOUND}", wait=True)`
     }
@@ -1200,10 +1284,10 @@ const BLOCK_DEFS = {
   sound_play: {
     cat: 'sound', shape: 'stack', label: '播放音效 {SOUND}',
     params: { SOUND: { type: 'text', val: 'Meow' } },
-    concept: '「非同步（Non-blocking）」播放音效：啟動聲音後程式立刻繼續執行下一行。',
-    tip: '遊戲中的射擊、跳躍音效都必須用非同步播放，才不會讓角色動作卡頓。',
+    concept: '非同步播放音效：啟動聲音後立刻執行下一行。',
+    tip: '遊戲音效通常使用非同步播放以免卡頓。',
     code: {
-      cpp: p => `playSoundAsync("${p.SOUND}"); // 立即繼續執行`,
+      cpp: p => `playSoundAsync("${p.SOUND}");`,
       cs: p => `player.Play(); // "${p.SOUND}"`,
       py: p => `play_sound("${p.SOUND}", wait=False)`
     }
@@ -1211,19 +1295,15 @@ const BLOCK_DEFS = {
   sound_stopallsounds: {
     cat: 'sound', shape: 'stack', label: '停播所有音效',
     params: {},
-    concept: '呼叫音訊管理器的停止方法，中斷所有正在播放的音軌。',
-    tip: '常在切換關卡或遊戲結束（Game Over）時呼叫。',
-    code: {
-      cpp: () => `stopAllSounds();`,
-      cs: () => `AudioManager.StopAll();`,
-      py: () => `pygame.mixer.stop()`
-    }
+    concept: '停止目前所有正在播放的音效。',
+    tip: '常用於切換場景或結束畫面。',
+    code: { cpp: () => `stopAllSounds();`, cs: () => `AudioManager.StopAll();`, py: () => `pygame.mixer.stop()` }
   },
   sound_changeeffectby: {
     cat: 'sound', shape: 'stack', label: '音效 {EFFECT} 改變 {VALUE}',
     params: { EFFECT: { type: 'select', val: 'PITCH', options: [['PITCH', '音調'], ['PAN', '聲道平衡']] }, VALUE: { type: 'num', val: '10' } },
-    concept: '調整音訊的播放速率（音調）或左右聲道平衡參數。',
-    tip: '提高播放速度（Pitch）通常會讓聲音聽起來變尖、變快。',
+    concept: '調整音調或左右聲道平衡。',
+    tip: '改變音調會影響播放速率與音高。',
     code: {
       cpp: p => `soundEffect["${p.EFFECT}"] += ${p.VALUE};`,
       cs: p => `soundEffect["${p.EFFECT}"] += ${p.VALUE};`,
@@ -1233,8 +1313,8 @@ const BLOCK_DEFS = {
   sound_seteffectto: {
     cat: 'sound', shape: 'stack', label: '音效 {EFFECT} 設為 {VALUE}',
     params: { EFFECT: { type: 'select', val: 'PITCH', options: [['PITCH', '音調'], ['PAN', '聲道平衡']] }, VALUE: { type: 'num', val: '100' } },
-    concept: '直接設定音調或聲道平衡的數值。',
-    tip: '聲道平衡 -100 代表純左聲道，0 代表置中，100 代表純右聲道。',
+    concept: '設定音調或聲道平衡數值。',
+    tip: '聲道平衡 -100 為左、0 為中、100 為右。',
     code: {
       cpp: p => `soundEffect["${p.EFFECT}"] = ${p.VALUE};`,
       cs: p => `soundEffect["${p.EFFECT}"] = ${p.VALUE};`,
@@ -1244,21 +1324,17 @@ const BLOCK_DEFS = {
   sound_cleareffects: {
     cat: 'sound', shape: 'stack', label: '音效清除',
     params: {},
-    concept: '將音調與聲道效果重設回預設值。',
-    tip: '清空特效設定字典或重設音訊濾波器。',
-    code: {
-      cpp: () => `soundEffect.clear();`,
-      cs: () => `soundEffect.Clear();`,
-      py: () => `sound_effect.clear()`
-    }
+    concept: '重設所有音效濾鏡參數。',
+    tip: '恢復預設音調與聲道。',
+    code: { cpp: () => `soundEffect.clear();`, cs: () => `soundEffect.Clear();`, py: () => `sound_effect.clear()` }
   },
   sound_changevolumeby: {
     cat: 'sound', shape: 'stack', label: '音量改變 {VOLUME}',
     params: { VOLUME: { type: 'num', val: '-10' } },
-    concept: '遞增或遞減音量變數（範圍通常限制在 0 ~ 100 之間）。',
-    tip: '通常會用 clamp(volume, 0, 100) 確保音量不會變成負數或超過 100%。',
+    concept: '增減音量變數（限制在 0~100）。',
+    tip: '使用 clamp 可避免音量超出範圍。',
     code: {
-      cpp: p => `volume = std::clamp(volume + (${p.VOLUME}), 0, 100);`,
+      cpp: p => `volume = clamp(volume + (${p.VOLUME}), 0, 100);`,
       cs: p => `volume = Math.Clamp(volume + (${p.VOLUME}), 0, 100);`,
       py: p => `volume = max(0, min(100, volume + (${p.VOLUME})))`
     }
@@ -1266,61 +1342,52 @@ const BLOCK_DEFS = {
   sound_setvolumeto: {
     cat: 'sound', shape: 'stack', label: '音量設為 {VOLUME} %',
     params: { VOLUME: { type: 'num', val: '100' } },
-    concept: '直接設定音量百分比。',
-    tip: '許多底層音訊庫（如 Pygame）的音量範圍是 0.0 ~ 1.0，需除以 100。',
-    code: {
-      cpp: p => `volume = ${p.VOLUME};`,
-      cs: p => `volume = ${p.VOLUME};`,
-      py: p => `volume = ${p.VOLUME}`
-    }
+    concept: '設定音量百分比。',
+    tip: '部分音訊函式庫使用 0.0~1.0 浮點數表示音量。',
+    code: { cpp: p => `volume = ${p.VOLUME};`, cs: p => `volume = ${p.VOLUME};`, py: p => `volume = ${p.VOLUME}` }
   },
   sound_volume: {
     cat: 'sound', shape: 'reporter', label: '音量',
     params: {},
-    concept: '讀取目前的音量數值變數。',
-    tip: '可用於製作畫面上的音量條顯示。',
+    concept: '讀取目前音量數值。',
+    tip: '可用於音量顯示條。',
     code: { cpp: () => `volume`, cs: () => `volume`, py: () => `volume` }
   },
 
-  // === EVENTS (事件) ===
   event_whenflagclicked: {
     cat: 'events', shape: 'hat', label: '當 ⚑ 被點擊',
     params: {},
-    concept: '程式的「進入點（Entry Point）」。文字語言不像 Scratch 有綠旗，而是從 main() 或檔案最上方開始執行。',
-    tip: 'C++ 與 C# 規定程式必須從 Main 函式開始；Python 則直接由上往下執行。',
+    concept: '帽型事件積木：對應到程式進入點 main()。',
+    tip: 'C++ 從 main() 開始執行；C# 使用頂層陳述式；Python 由上往下執行。',
     code: {
-      cpp: () => `int main() { // 程式進入點（相當於綠旗點擊）`,
-      cs: () => `static void Main(string[] args) { // 程式進入點`,
-      py: () => `def main(): # 程式主進入點`
+      cpp: () => `int main() { // 程式進入點`,
+      cs: () => ``,
+      py: () => ``
     }
   },
   event_whenkeypressed: {
     cat: 'events', shape: 'hat', label: '當 {KEY} 鍵被按下',
-    params: { KEY: { type: 'select', val: 'space', options: [['space', '空白'], ['up arrow', '向上'], ['down arrow', '向下'], ['left arrow', '向左'], ['right arrow', '向右'], ['a', 'A']] } },
-    concept: '事件監聽器（Event Listener）或鍵盤回呼函式（Callback）。',
-    tip: '在視窗或遊戲框架中，會註冊一個專門處理鍵盤按下的函式。',
+    params: { KEY: { type: 'select', val: 'space', options: [['space', '空白'], ['up arrow', '向上'], ['down arrow', '向下'], ['left arrow', '向左'], ['right arrow', '向右']] } },
+    concept: '按鍵事件處理函式。',
+    tip: '在視窗或遊戲框架中註冊按鍵回呼。',
     code: {
-      cpp: p => `void onKeyPress_${p.KEY}() { // 當按下 ${p.KEY} 鍵時觸發`,
-      cs: p => `void OnKeyPress_${p.KEY}() { // 當按下 ${p.KEY} 鍵時觸發`,
-      py: p => `def on_key_press_${p.KEY}(): # 當按下 ${p.KEY} 鍵時觸發`
+      cpp: p => `void onKeyPress_${p.KEY}() {`,
+      cs: p => `void OnKeyPress_${p.KEY}() {`,
+      py: p => `def on_key_press_${p.KEY}():`
     }
   },
   event_whenthisspriteclicked: {
     cat: 'events', shape: 'hat', label: '當角色被點擊',
     params: {},
-    concept: '滑鼠點擊事件（OnClick Event），類似網頁按鈕或遊戲物件的點擊回呼。',
-    tip: '底層原理是偵測滑鼠按下時，滑鼠座標是否落在角色矩形範圍內。',
-    code: {
-      cpp: () => `void onSpriteClicked() { // 角色點擊事件處理函式`,
-      cs: () => `void OnSpriteClicked() { // 角色點擊事件處理函式`,
-      py: () => `def on_sprite_clicked(): # 角色點擊事件處理函式`
-    }
+    concept: '角色點擊事件處理函式。',
+    tip: '透過滑鼠點擊座標與角色範圍判定觸發。',
+    code: { cpp: () => `void onSpriteClicked() {`, cs: () => `void OnSpriteClicked() {`, py: () => `def on_sprite_clicked():` }
   },
   event_whenbackdropswitchesto: {
     cat: 'events', shape: 'hat', label: '當背景換成 {BACKDROP}',
     params: { BACKDROP: { type: 'text', val: 'backdrop1' } },
-    concept: '狀態變更事件（State Change Event），當場景切換到特定關卡時自動執行的初始化函式。',
-    tip: '適合用來在切換關卡時重設敵人位置與關卡分數。',
+    concept: '背景切換事件處理函式。',
+    tip: '適合放關卡初始化程式。',
     code: {
       cpp: p => `void onBackdrop_${p.BACKDROP}() {`,
       cs: p => `void OnBackdrop_${p.BACKDROP}() {`,
@@ -1330,56 +1397,47 @@ const BLOCK_DEFS = {
   event_whengreaterthan: {
     cat: 'events', shape: 'hat', label: '當 {MENU} > {VALUE}',
     params: { MENU: { type: 'select', val: 'LOUDNESS', options: [['LOUDNESS', '響度'], ['TIMER', '計時器']] }, VALUE: { type: 'num', val: '10' } },
-    concept: '條件觸發事件（Threshold Trigger），在主迴圈中持續檢查感測器或計時器是否超過門檻值。',
-    tip: '感測器類型的觸發在底層通常是以輪詢（Polling）方式不斷比對數值。',
+    concept: '數值超過門檻時觸發的條件分支。',
+    tip: '通常在主迴圈中持續檢查數值。',
     code: {
-      cpp: p => `if (${p.MENU.toLowerCase()} > ${p.VALUE}) { // 門檻觸發`,
-      cs: p => `if (${p.MENU.toLowerCase()} > ${p.VALUE}) { // 門檻觸發`,
-      py: p => `if ${p.MENU.toLowerCase()} > ${p.VALUE}: # 門檻觸發`
+      cpp: p => `if (${p.MENU.toLowerCase()} > ${p.VALUE}) {`,
+      cs: p => `if (${p.MENU.toLowerCase()} > ${p.VALUE}) {`,
+      py: p => `if ${p.MENU.toLowerCase()} > ${p.VALUE}:`
     }
   },
   event_whenbroadcastreceived: {
     cat: 'events', shape: 'hat', label: '當收到訊息 {MSG}',
     params: { MSG: { type: 'text', val: 'message1' } },
-    concept: '對應到「函式定義（Function Definition）」或「事件訂閱（Subscribe）」。',
-    tip: '把廣播訊息名稱想成「函式名稱」，收到訊息就是「執行這個函式」！',
+    concept: '對應到自訂函式定義。',
+    tip: '收到廣播就像是呼叫對應名稱的函式。',
     code: {
-      cpp: p => `void on_${p.MSG}() { // 收到廣播 "${p.MSG}" 時執行的函式`,
-      cs: p => `void On_${p.MSG}() { // 收到廣播 "${p.MSG}" 時執行的方法`,
-      py: p => `def on_${p.MSG}(): # 收到廣播 "${p.MSG}" 時執行的函式`
+      cpp: p => `void on_${p.MSG}() {`,
+      cs: p => `void On_${p.MSG}() {`,
+      py: p => `def on_${p.MSG}():`
     }
   },
   event_broadcast: {
     cat: 'events', shape: 'stack', label: '廣播訊息 {MSG}',
     params: { MSG: { type: 'text', val: 'message1' } },
-    concept: '對應到「呼叫函式（Function Call）」或「觸發事件（Emit Event）」。',
-    tip: 'Scratch 的廣播能讓不同角色互相溝通，在程式中就是呼叫對方的方法或發送事件。',
-    code: {
-      cpp: p => `on_${p.MSG}(); // 呼叫對應的事件處理函式`,
-      cs: p => `On_${p.MSG}(); // 呼叫對應的事件處理方法`,
-      py: p => `on_${p.MSG}() # 呼叫對應的事件處理函式`
-    }
+    concept: '呼叫對應的事件處理函式。',
+    tip: '函式名稱後方需加小括號 ()。',
+    code: { cpp: p => `on_${p.MSG}();`, cs: p => `On_${p.MSG}();`, py: p => `on_${p.MSG}()` }
   },
   event_broadcastandwait: {
     cat: 'events', shape: 'stack', label: '廣播訊息 {MSG} 並等待',
     params: { MSG: { type: 'text', val: 'message1' } },
-    concept: '同步函式呼叫（Synchronous Call）：必須等被呼叫的函式全部執行完畢，才會繼續執行下一行。',
-    tip: '一般的循序程式中，呼叫函式預設就是「執行完才往下走」，完全符合「廣播並等待」！',
-    code: {
-      cpp: p => `on_${p.MSG}(); // 同步呼叫：等函式跑完才繼續下一行`,
-      cs: p => `await On_${p.MSG}Async(); // 等待非同步任務完成`,
-      py: p => `on_${p.MSG}() # 同步呼叫：等函式跑完才繼續下一行`
-    }
+    concept: '等待函式執行完畢後再繼續下一行。',
+    tip: '循序程式預設即為同步執行。',
+    code: { cpp: p => `on_${p.MSG}();`, cs: p => `await On_${p.MSG}Async();`, py: p => `on_${p.MSG}()` }
   },
 
-  // === CONTROL (控制) ===
   control_wait: {
     cat: 'control', shape: 'stack', label: '等待 {DURATION} 秒',
     params: { DURATION: { type: 'num', val: '1' } },
-    concept: '讓目前執行緒休眠（Sleep）指定的時間。',
-    tip: '注意單位差異：C# 的 Thread.Sleep() 單位是「毫秒（1000 毫秒 = 1 秒）」，Python 的 time.sleep() 則是「秒」。',
+    concept: '暫停執行指定秒數。',
+    tip: 'C# Thread.Sleep 單位為毫秒，需乘以 1000。',
     code: {
-      cpp: p => `std::this_thread::sleep_for(std::chrono::milliseconds((int)(${p.DURATION} * 1000)));`,
+      cpp: p => `this_thread::sleep_for(chrono::milliseconds((int)(${p.DURATION} * 1000)));`,
       cs: p => `Thread.Sleep((int)(${p.DURATION} * 1000));`,
       py: p => `time.sleep(${p.DURATION})`
     }
@@ -1387,8 +1445,8 @@ const BLOCK_DEFS = {
   control_repeat: {
     cat: 'control', shape: 'c-block', label: '重複 {TIMES} 次',
     params: { TIMES: { type: 'num', val: '10' } },
-    concept: '計數型迴圈（for loop）。用一個計數器變數 i 從 0 數到 N-1，共執行 N 次。',
-    tip: 'C++ 與 C# 用大括號 { } 包住迴圈內容；Python 沒有大括號，完全靠「縮排（4 個空白）」決定哪些程式在迴圈裡！',
+    concept: 'C 型計數迴圈：對應 for 迴圈。',
+    tip: 'C++/C# 用 { } 包住區塊；Python 用縮排。',
     code: {
       cpp: p => [`for (int i = 0; i < ${p.TIMES}; i++) {`, `}`],
       cs: p => [`for (int i = 0; i < ${p.TIMES}; i++) {`, `}`],
@@ -1398,8 +1456,8 @@ const BLOCK_DEFS = {
   control_forever: {
     cat: 'control', shape: 'c-block', label: '重複無限次',
     params: {},
-    concept: '無窮迴圈（Infinite Loop），遊戲主迴圈（Game Loop）的核心結構。',
-    tip: '寫無窮迴圈時，通常會在裡面搭配「如果...那麼 停止（break）」作為離開條件，否則程式會永遠停不下來。',
+    concept: 'C 型無窮迴圈：對應 while (true) / while True:。',
+    tip: '常搭配 break 條件離開迴圈。',
     code: {
       cpp: () => [`while (true) {`, `}`],
       cs: () => [`while (true) {`, `}`],
@@ -1409,8 +1467,8 @@ const BLOCK_DEFS = {
   control_if: {
     cat: 'control', shape: 'c-block', label: '如果 {CONDITION} 那麼',
     params: { CONDITION: { type: 'bool', val: null } },
-    concept: '單向條件判斷（if statement）：只有當條件為真（true）時，才執行凹槽內的程式。',
-    tip: 'C++ 和 C# 的條件式必須用小括號 ( ) 包起來；Python 不需要小括號，但結尾必須加冒號 : 。',
+    concept: 'C 型單向條件判斷：if 敘述。',
+    tip: '條件成立才執行凹槽內程式。',
     code: {
       cpp: (p, cond) => [`if (${cond || 'condition'}) {`, `}`],
       cs: (p, cond) => [`if (${cond || 'condition'}) {`, `}`],
@@ -1420,8 +1478,8 @@ const BLOCK_DEFS = {
   control_if_else: {
     cat: 'control', shape: 'c-block-else', label: '如果 {CONDITION} 那麼', elseLabel: '否則',
     params: { CONDITION: { type: 'bool', val: null } },
-    concept: '雙向條件判斷（if-else）：條件成立執行第一段，不成立則執行 else 區塊（二選一）。',
-    tip: '無論條件結果為何，if 與 else 兩段程式必定只會執行其中一段。',
+    concept: '雙向條件判斷：if / else 二選一。',
+    tip: '成立走 if 區塊，不成立走 else 區塊。',
     code: {
       cpp: (p, cond) => [`if (${cond || 'condition'}) {`, `} else {`, `}`],
       cs: (p, cond) => [`if (${cond || 'condition'}) {`, `} else {`, `}`],
@@ -1431,19 +1489,19 @@ const BLOCK_DEFS = {
   control_wait_until: {
     cat: 'control', shape: 'stack', label: '等待直到 {CONDITION}',
     params: { CONDITION: { type: 'bool', val: null } },
-    concept: '用一個空的 while 迴圈「當條件還不成立時（!condition），就繼續原地等待」。',
-    tip: '注意邏輯反轉：「等待直到 X 成立」等價於「當 X 還不成立時，繼續等」。',
+    concept: '條件不成立時持續等待。',
+    tip: '邏輯上是 while (!條件)。',
     code: {
-      cpp: (p, cond) => `while (!(${cond || 'condition'})) { /* 等待 */ }`,
-      cs: (p, cond) => `while (!(${cond || 'condition'})) { /* 等待 */ }`,
+      cpp: (p, cond) => `while (!(${cond || 'condition'})) { }`,
+      cs: (p, cond) => `while (!(${cond || 'condition'})) { }`,
       py: (p, cond) => `while not (${cond || 'condition'}): pass`
     }
   },
   control_repeat_until: {
     cat: 'control', shape: 'c-block', label: '重複直到 {CONDITION}',
     params: { CONDITION: { type: 'bool', val: null } },
-    concept: '條件型迴圈（while loop）：文字語言通常寫成「當條件還不成立時，就重複執行」。',
-    tip: 'Scratch 是「直到條件成立才停」，C++/C#/Python 的 while 則是「條件成立就繼續做」，兩者剛好相反（加驚嘆號 ! 或 not）。',
+    concept: '直到條件成立才停止的迴圈。',
+    tip: '在 while 中需將條件取反（! 或 not）。',
     code: {
       cpp: (p, cond) => [`while (!(${cond || 'condition'})) {`, `}`],
       cs: (p, cond) => [`while (!(${cond || 'condition'})) {`, `}`],
@@ -1453,8 +1511,8 @@ const BLOCK_DEFS = {
   control_while: {
     cat: 'control', shape: 'c-block', label: '當 {CONDITION} 重複',
     params: { CONDITION: { type: 'bool', val: null } },
-    concept: '與文字型語言的 while 迴圈完全一模一樣！只要條件為真就持續重複執行。',
-    tip: '這是 TurboWarp / Scratch 隱藏積木，最貼近 C++、C#、Python 原生的 while 語法。',
+    concept: '條件成立就重複執行的 while 迴圈。',
+    tip: '與文字語言的 while 條件方向一致。',
     code: {
       cpp: (p, cond) => [`while (${cond || 'condition'}) {`, `}`],
       cs: (p, cond) => [`while (${cond || 'condition'}) {`, `}`],
@@ -1464,100 +1522,83 @@ const BLOCK_DEFS = {
   control_stop: {
     cat: 'control', shape: 'cap', label: '停止 {STOP_OPTION}',
     params: { STOP_OPTION: { type: 'select', val: 'all', options: [['all', '全部'], ['this script', '這個程式'], ['other scripts in sprite', '角色的其他程式']] } },
-    concept: '中斷迴圈（break）、結束函式（return），或直接終止整個程式（exit）。',
-    tip: '若在迴圈內要跳出迴圈用 break；要結束整個函式用 return；強制關閉程式用 exit(0)。',
+    concept: '底部平口停止積木：結束函式（return）或終止程式。',
+    tip: '下方不能再接續其他積木。',
     code: {
-      cpp: p => p.STOP_OPTION === 'all' ? `exit(0); // 結束整個程式` : `return; // 結束目前函式或 break 跳出迴圈`,
-      cs: p => p.STOP_OPTION === 'all' ? `Environment.Exit(0); // 結束整個程式` : `return; // 結束目前方法`,
-      py: p => p.STOP_OPTION === 'all' ? `sys.exit() # 結束整個程式` : `return # 結束目前函式或 break 跳出迴圈`
+      cpp: p => p.STOP_OPTION === 'all' ? `exit(0);` : `return;`,
+      cs: p => p.STOP_OPTION === 'all' ? `Environment.Exit(0);` : `return;`,
+      py: p => p.STOP_OPTION === 'all' ? `sys.exit()` : `return`
     }
   },
   control_start_as_clone: {
     cat: 'control', shape: 'hat', label: '當分身產生時',
     params: {},
-    concept: '物件導向（OOP）中的「建構函式（Constructor）」！每當建立一個新物件實例時自動執行初始化。',
-    tip: '每個分身都有自己獨立的成員變數（如 x, y, hp），彼此不會互相干擾。',
+    concept: '帽型分身進入點：以獨立函式初始化分身的起始狀態。',
+    tip: '可搭配陣列或串列儲存各個分身的座標與狀態。',
     code: {
-      cpp: () => `Clone(float startX, float startY) : x(startX), y(startY) { // 分身建構函式`,
-      cs: () => `public Clone(float startX, float startY) { x = startX; y = startY; // 分身建構函式`,
-      py: () => `def __init__(self, start_x, start_y): self.x, self.y = start_x, start_y # 分身建構函式`
+      cpp: () => `void onStartAsClone(float startX, float startY) { x = startX; y = startY;`,
+      cs: () => `void OnStartAsClone(float startX, float startY) { x = startX; y = startY;`,
+      py: () => `def on_start_as_clone(start_x, start_y): x, y = start_x, start_y`
     }
   },
   control_create_clone_of: {
     cat: 'control', shape: 'stack', label: '建立 {CLONE_OPTION} 的分身',
     params: { CLONE_OPTION: { type: 'select', val: '_myself_', options: [['_myself_', '自己'], ['Sprite1', '角色1']] } },
-    concept: '實例化（Instantiate）一個新物件，並放進動態陣列（std::vector / List / list）中統一管理。',
-    tip: '射擊遊戲的子彈、掉落的蘋果，在程式中都是透過「類別 + 動態串列」大量產生的！',
+    concept: '建立新分身資料並加入動態陣列／串列。',
+    tip: '常用於子彈、掉落物等大量物件管理。',
     code: {
-      cpp: () => `clones.emplace_back(x, y); // 建立分身物件並加入 vector`,
-      cs: () => `clones.Add(new Clone(x, y)); // 建立新物件並加入 List`,
-      py: () => `clones.append(Clone(x, y)) # 建立新物件並加入 list`
+      cpp: () => `cloneXs.push_back(x); cloneYs.push_back(y);`,
+      cs: () => `cloneXs.Add(x); cloneYs.Add(y);`,
+      py: () => `clone_xs.append(x); clone_ys.append(y)`
     }
   },
   control_delete_this_clone: {
     cat: 'control', shape: 'cap', label: '刪除分身',
     params: {},
-    concept: '將不再需要的分身標記為無效（active = false），並從動態陣列中移除以釋放記憶體。',
-    tip: '在迴圈巡覽串列時不能直接刪除元素，通常會先標記 active = false，再統一清除。',
+    concept: '底部平口刪除積木：標記分身無效並從集合中移除。',
+    tip: '分身銷毀後不再接續執行後續指令。',
     code: {
-      cpp: () => `this->active = false; // 標記銷毀，由主迴圈從 vector 移除`,
-      cs: () => `this.Active = false; // 標記銷毀，由主迴圈從 List 移除`,
-      py: () => `self.active = False # 標記銷毀，由主迴圈從 list 移除`
+      cpp: () => `active = false;`,
+      cs: () => `active = false;`,
+      py: () => `active = False`
     }
   },
 
-  // === SENSING (偵測) ===
   sensing_touchingobject: {
     cat: 'sensing', shape: 'boolean', label: '碰到 {TARGET} ？',
     params: { TARGET: { type: 'select', val: '_mouse_', options: [['_mouse_', '鼠標'], ['_edge_', '邊緣'], ['Sprite2', '角色2']] } },
-    concept: '碰撞偵測（Collision Detection），檢查兩個矩形（AABB）或圓形距離是否重疊，回傳布林值。',
-    tip: '六角形積木代表「布林值（Boolean）」，結果只有 true 或 false。',
-    code: {
-      cpp: p => `isTouching("${p.TARGET}")`,
-      cs: p => `IsTouching("${p.TARGET}")`,
-      py: p => `is_touching("${p.TARGET}")`
-    }
+    concept: '六角形布林積木：回傳碰撞偵測結果（true / false）。',
+    tip: '可拖入「如果...那麼」的六角形插槽。',
+    code: { cpp: p => `isTouching("${p.TARGET}")`, cs: p => `IsTouching("${p.TARGET}")`, py: p => `is_touching("${p.TARGET}")` }
   },
   sensing_touchingcolor: {
     cat: 'sensing', shape: 'boolean', label: '碰到顏色 {COLOR} ？',
     params: { COLOR: { type: 'color', val: '#0c2b09' } },
-    concept: '讀取角色目前座標下方畫布的像素 RGB 顏色值，比對是否等於目標色碼。',
-    tip: '網頁與電腦螢幕的顏色通常用 16 進位色碼（Hex，如 #0c2b09）表示。',
-    code: {
-      cpp: p => `isTouchingColor("${p.COLOR}")`,
-      cs: p => `IsTouchingColor("${p.COLOR}")`,
-      py: p => `is_touching_color("${p.COLOR}")`
-    }
+    concept: '比對座標下方畫布像素顏色。',
+    tip: '顏色通常以 16 進位色碼表示。',
+    code: { cpp: p => `isTouchingColor("${p.COLOR}")`, cs: p => `IsTouchingColor("${p.COLOR}")`, py: p => `is_touching_color("${p.COLOR}")` }
   },
   sensing_coloristouchingcolor: {
     cat: 'sensing', shape: 'boolean', label: '顏色 {COLOR} 碰到 {COLOR2} ？',
     params: { COLOR: { type: 'color', val: '#8836a4' }, COLOR2: { type: 'color', val: '#85ebef' } },
-    concept: '比對角色特定色塊區域的像素是否與背景目標顏色重疊。',
-    tip: '在真實遊戲開發中，為了效能通常會用座標矩形碰撞取代像素顏色碰撞。',
-    code: {
-      cpp: p => `isColorTouching("${p.COLOR}", "${p.COLOR2}")`,
-      cs: p => `IsColorTouching("${p.COLOR}", "${p.COLOR2}")`,
-      py: p => `is_color_touching("${p.COLOR}", "${p.COLOR2}")`
-    }
+    concept: '檢查兩種顏色區域是否重疊。',
+    tip: '回傳布林值。',
+    code: { cpp: p => `isColorTouching("${p.COLOR}", "${p.COLOR2}")`, cs: p => `IsColorTouching("${p.COLOR}", "${p.COLOR2}")`, py: p => `is_color_touching("${p.COLOR}", "${p.COLOR2}")` }
   },
   sensing_distanceto: {
     cat: 'sensing', shape: 'reporter', label: '與 {TARGET} 的間距',
     params: { TARGET: { type: 'select', val: '_mouse_', options: [['_mouse_', '鼠標'], ['Sprite2', '角色2']] } },
-    concept: '國中數學的「兩點距離公式（畢氏定理）」：√((x2 - x1)² + (y2 - y1)²)。',
-    tip: 'C++ 與 C# 的 Math.Sqrt() / std::hypot() 都能直接幫我們算出斜邊距離！',
-    code: {
-      cpp: () => `std::hypot(mouseX - x, mouseY - y)`,
-      cs: () => `Math.Sqrt(Math.Pow(mouseX - x, 2) + Math.Pow(mouseY - y, 2))`,
-      py: () => `math.hypot(mouse_x - x, mouse_y - y)`
-    }
+    concept: '兩點間距離公式：√((x2-x1)² + (y2-y1)²)。',
+    tip: '可使用 hypot 或 Math.Sqrt 計算。',
+    code: { cpp: () => `hypot(mouseX - x, mouseY - y)`, cs: () => `Math.Sqrt(Math.Pow(mouseX - x, 2) + Math.Pow(mouseY - y, 2))`, py: () => `math.hypot(mouse_x - x, mouse_y - y)` }
   },
   sensing_askandwait: {
     cat: 'sensing', shape: 'stack', label: '詢問 {QUESTION} 並等待',
     params: { QUESTION: { type: 'text', val: '你的名字是？' } },
-    concept: '標準輸入（Standard Input）：印出提示問題後，暫停程式等待使用者從鍵盤輸入文字。',
-    tip: 'C++ 使用 std::getline(std::cin, answer)、C# 使用 Console.ReadLine()、Python 使用 input()。',
+    concept: '提示使用者輸入文字並等待確認。',
+    tip: 'Python 使用 input()；C# 使用 Console.ReadLine()。',
     code: {
-      cpp: p => `std::cout << "${p.QUESTION} "; std::getline(std::cin, answer);`,
+      cpp: p => `cout << "${p.QUESTION} "; getline(cin, answer);`,
       cs: p => `Console.Write("${p.QUESTION} "); string answer = Console.ReadLine();`,
       py: p => `answer = input("${p.QUESTION} ")`
     }
@@ -1565,531 +1606,120 @@ const BLOCK_DEFS = {
   sensing_answer: {
     cat: 'sensing', shape: 'reporter', label: '詢問的答案',
     params: {},
-    concept: '存放使用者剛剛透過標準輸入鍵入的字串變數。',
-    tip: '注意：從鍵盤讀進來的資料預設都是「字串（string）」，若要計算加減乘除需先轉成數字（int / float）。',
+    concept: '儲存使用者輸入內容的變數。',
+    tip: '輸入內容預設為字串型別。',
     code: { cpp: () => `answer`, cs: () => `answer`, py: () => `answer` }
   },
   sensing_keypressed: {
     cat: 'sensing', shape: 'boolean', label: '按下 {KEY} 鍵？',
     params: { KEY: { type: 'select', val: 'space', options: [['space', '空白'], ['up arrow', '向上'], ['down arrow', '向下'], ['left arrow', '向左'], ['right arrow', '向右']] } },
-    concept: '即時查詢鍵盤狀態陣列，判斷某個按鍵目前是否正被按住（回傳 true / false）。',
-    tip: '搭配「重複無限次 + 如果」一起使用，可以做出比「當按鍵被按下」更流暢的遊戲角色移動！',
-    code: {
-      cpp: p => `isKeyDown("${p.KEY}")`,
-      cs: p => `Input.IsKeyDown("${p.KEY}")`,
-      py: p => `is_key_pressed("${p.KEY}")`
-    }
+    concept: '查詢指定按鍵是否正被按下（回傳布林值）。',
+    tip: '適合放進「如果」條件插槽中。',
+    code: { cpp: p => `isKeyDown("${p.KEY}")`, cs: p => `Input.IsKeyDown("${p.KEY}")`, py: p => `is_key_pressed("${p.KEY}")` }
   },
   sensing_mousedown: {
     cat: 'sensing', shape: 'boolean', label: '按下滑鼠鍵？',
     params: {},
-    concept: '回傳滑鼠左鍵目前是否處於按下狀態（布林值）。',
-    tip: '可用於連續射擊或拖曳繪圖功能。',
+    concept: '滑鼠按鍵是否按下（布林值）。',
+    tip: '回傳 true / false。',
     code: { cpp: () => `isMouseDown()`, cs: () => `Input.IsMouseDown()`, py: () => `is_mouse_down()` }
   },
-  sensing_mousex: {
-    cat: 'sensing', shape: 'reporter', label: '鼠標的 x',
-    params: {},
-    concept: '讀取滑鼠游標目前的水平座標。',
-    tip: '游標座標會隨滑鼠移動即時更新。',
-    code: { cpp: () => `mouseX`, cs: () => `mouseX`, py: () => `mouse_x` }
-  },
-  sensing_mousey: {
-    cat: 'sensing', shape: 'reporter', label: '鼠標的 y',
-    params: {},
-    concept: '讀取滑鼠游標目前的垂直座標。',
-    tip: '可搭配「定位到 x: 鼠標的 x」製作打磚塊的擋板！',
-    code: { cpp: () => `mouseY`, cs: () => `mouseY`, py: () => `mouse_y` }
-  },
+  sensing_mousex: { cat: 'sensing', shape: 'reporter', label: '鼠標的 x', params: {}, concept: '讀取滑鼠 X 座標。', tip: '隨游標移動更新。', code: { cpp: () => `mouseX`, cs: () => `mouseX`, py: () => `mouse_x` } },
+  sensing_mousey: { cat: 'sensing', shape: 'reporter', label: '鼠標的 y', params: {}, concept: '讀取滑鼠 Y 座標。', tip: '隨游標移動更新。', code: { cpp: () => `mouseY`, cs: () => `mouseY`, py: () => `mouse_y` } },
   sensing_setdragmode: {
     cat: 'sensing', shape: 'stack', label: '拖曳模式設為 {MODE}',
     params: { MODE: { type: 'select', val: 'draggable', options: [['draggable', '可拖曳'], ['not draggable', '不可拖曳']] } },
-    concept: '設定物件是否允許滑鼠直接拖放的布林屬性。',
-    tip: '在 UI 框架中通常稱為 draggable 屬性。',
+    concept: '設定物件是否可被滑鼠拖曳。',
+    tip: '對應布林屬性 draggable。',
     code: {
       cpp: p => `draggable = ${p.MODE === 'draggable' ? 'true' : 'false'};`,
       cs: p => `draggable = ${p.MODE === 'draggable' ? 'true' : 'false'};`,
       py: p => `draggable = ${p.MODE === 'draggable' ? 'True' : 'False'}`
     }
   },
-  sensing_loudness: {
-    cat: 'sensing', shape: 'reporter', label: '響度',
-    params: {},
-    concept: '從麥克風音訊輸入緩衝區計算目前的音量振幅（0 ~ 100）。',
-    tip: '沒有麥克風時通常會回傳 -1。',
-    code: { cpp: () => `getMicLoudness()`, cs: () => `AudioInput.Loudness`, py: () => `get_mic_loudness()` }
-  },
-  sensing_timer: {
-    cat: 'sensing', shape: 'reporter', label: '計時器',
-    params: {},
-    concept: '計算「現在時間」減去「起始時間點」所經過的秒數（浮點數）。',
-    tip: 'C# 的 Stopwatch 類別與 Python 的 time.time() 是最常用的計時工具。',
-    code: {
-      cpp: () => `getElapsedSeconds()`,
-      cs: () => `stopwatch.Elapsed.TotalSeconds`,
-      py: () => `(time.time() - start_time)`
-    }
-  },
-  sensing_resettimer: {
-    cat: 'sensing', shape: 'stack', label: '計時器重置',
-    params: {},
-    concept: '將起始時間基準點重新設為「現在這一刻」，讓經過時間歸零。',
-    tip: '計時器不會停止，只是把起點重新歸零再繼續往上數。',
-    code: {
-      cpp: () => `resetTimer();`,
-      cs: () => `stopwatch.Restart();`,
-      py: () => `start_time = time.time()`
-    }
-  },
+  sensing_loudness: { cat: 'sensing', shape: 'reporter', label: '響度', params: {}, concept: '讀取麥克風音量數值。', tip: '範圍通常為 0~100。', code: { cpp: () => `getMicLoudness()`, cs: () => `AudioInput.Loudness`, py: () => `get_mic_loudness()` } },
+  sensing_timer: { cat: 'sensing', shape: 'reporter', label: '計時器', params: {}, concept: '回傳經過的秒數。', tip: '可用於倒數或反應時間計算。', code: { cpp: () => `getElapsedSeconds()`, cs: () => `stopwatch.Elapsed.TotalSeconds`, py: () => `(time.time() - start_time)` } },
+  sensing_resettimer: { cat: 'sensing', shape: 'stack', label: '計時器重置', params: {}, concept: '將計時器起點歸零。', tip: '計時器會從 0 重新開始累計。', code: { cpp: () => `resetTimer();`, cs: () => `stopwatch.Restart();`, py: () => `start_time = time.time()` } },
   sensing_of: {
     cat: 'sensing', shape: 'reporter', label: '{OBJECT} 的 {PROPERTY}',
     params: { OBJECT: { type: 'select', val: '_stage_', options: [['_stage_', '舞台'], ['Sprite1', '角色1']] }, PROPERTY: { type: 'select', val: 'backdrop #', options: [['backdrop #', '背景編號'], ['x position', 'x 座標'], ['y position', 'y 座標']] } },
-    concept: '物件導向中的「屬性存取（Property Access）」，透過小數點 . 讀取另一個物件的公開屬性。',
-    tip: '小數點（.）在物件導向程式中就是「的」的意思（例如：stage.backdropNumber）。',
+    concept: '讀取其他物件或舞台的屬性。',
+    tip: '可透過對應的變數或查詢函式取得數值。',
     code: {
-      cpp: p => `${p.OBJECT === '_stage_' ? 'stage' : 'sprite1'}.getProperty("${p.PROPERTY}")`,
-      cs: p => `${p.OBJECT === '_stage_' ? 'stage' : 'sprite1'}.GetProperty("${p.PROPERTY}")`,
-      py: p => `${p.OBJECT === '_stage_' ? 'stage' : 'sprite1'}.get_property("${p.PROPERTY}")`
+      cpp: p => `getProperty("${p.OBJECT}", "${p.PROPERTY}")`,
+      cs: p => `GetProperty("${p.OBJECT}", "${p.PROPERTY}")`,
+      py: p => `get_property("${p.OBJECT}", "${p.PROPERTY}")`
     }
   },
   sensing_current: {
     cat: 'sensing', shape: 'reporter', label: '目前的 {MENU}',
     params: { MENU: { type: 'select', val: 'YEAR', options: [['YEAR', '年'], ['MONTH', '月'], ['DATE', '日'], ['HOUR', '時'], ['MINUTE', '分'], ['SECOND', '秒']] } },
-    concept: '讀取作業系統的系統時鐘（DateTime）。',
-    tip: 'C# 的 DateTime.Now 與 Python 的 datetime.now() 都能直接取得年月日與時分秒。',
+    concept: '讀取系統日期時間的指定欄位。',
+    tip: 'C# 用 DateTime.Now；Python 用 datetime.now()。',
     code: {
       cpp: p => `getCurrentDateTime("${p.MENU}")`,
       cs: p => `DateTime.Now.${p.MENU === 'DATE' ? 'Day' : p.MENU.charAt(0) + p.MENU.slice(1).toLowerCase()}`,
       py: p => `datetime.now().${p.MENU === 'DATE' ? 'day' : p.MENU.toLowerCase()}`
     }
   },
-  sensing_dayssince2000: {
-    cat: 'sensing', shape: 'reporter', label: '2000年至今的天數',
-    params: {},
-    concept: '時間戳記（Timestamp）差值計算：計算目前 UTC 時間與 2000/01/01 00:00:00 的總天數差。',
-    tip: '因為包含小數點，在 Scratch 中常被拿來當作精準到毫秒的高精度計時器！',
-    code: {
-      cpp: () => `getDaysSince2000()`,
-      cs: () => `(DateTime.UtcNow - new DateTime(2000, 1, 1)).TotalDays`,
-      py: () => `(datetime.now(timezone.utc) - datetime(2000, 1, 1, tzinfo=timezone.utc)).total_seconds() / 86400`
-    }
-  },
-  sensing_online: {
-    cat: 'sensing', shape: 'boolean', label: '已連線？',
-    params: {},
-    concept: '檢查裝置目前是否具備網路連線能力（回傳布林值）。',
-    tip: 'C# 內建 NetworkInterface.GetIsNetworkAvailable() 可直接檢查網路狀態。',
-    code: {
-      cpp: () => `isNetworkOnline()`,
-      cs: () => `System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable()`,
-      py: () => `is_network_online()`
-    }
-  },
-  sensing_username: {
-    cat: 'sensing', shape: 'reporter', label: '用戶名稱',
-    params: {},
-    concept: '取得目前登入系統或帳號的使用者名稱字串。',
-    tip: '在單機程式中通常會讀取作業系統的登入帳號（Environment.UserName）。',
-    code: {
-      cpp: () => `std::string(getenv("USERNAME"))`,
-      cs: () => `Environment.UserName`,
-      py: () => `getpass.getuser()`
-    }
-  },
+  sensing_dayssince2000: { cat: 'sensing', shape: 'reporter', label: '2000年至今的天數', params: {}, concept: '計算距 2000 年的天數差（含小數）。', tip: '可用作高精度時間差計算。', code: { cpp: () => `getDaysSince2000()`, cs: () => `(DateTime.UtcNow - new DateTime(2000, 1, 1)).TotalDays`, py: () => `(datetime.now(timezone.utc) - datetime(2000, 1, 1, tzinfo=timezone.utc)).total_seconds() / 86400` } },
+  sensing_online: { cat: 'sensing', shape: 'boolean', label: '已連線？', params: {}, concept: '回傳網路連線狀態布林值。', tip: 'true 代表已連線。', code: { cpp: () => `isNetworkOnline()`, cs: () => `System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable()`, py: () => `is_network_online()` } },
+  sensing_username: { cat: 'sensing', shape: 'reporter', label: '用戶名稱', params: {}, concept: '取得目前使用者名稱。', tip: '回傳字串。', code: { cpp: () => `string(getenv("USERNAME"))`, cs: () => `Environment.UserName`, py: () => `getpass.getuser()` } },
 
-  // === OPERATORS (運算) ===
-  operator_add: {
-    cat: 'operators', shape: 'reporter', label: '{NUM1} + {NUM2}',
-    params: { NUM1: { type: 'num', val: '3' }, NUM2: { type: 'num', val: '5' } },
-    concept: '算術加法運算子（+）。',
-    tip: '如果兩邊都是數字就做加法；若兩邊是字串，在 C# 與 Python 中則會變成「字串連接」！',
-    code: { cpp: p => `(${p.NUM1} + ${p.NUM2})`, cs: p => `(${p.NUM1} + ${p.NUM2})`, py: p => `(${p.NUM1} + ${p.NUM2})` }
-  },
-  operator_subtract: {
-    cat: 'operators', shape: 'reporter', label: '{NUM1} - {NUM2}',
-    params: { NUM1: { type: 'num', val: '10' }, NUM2: { type: 'num', val: '4' } },
-    concept: '算術減法運算子（-）。',
-    tip: '與數學四則運算完全相同。',
-    code: { cpp: p => `(${p.NUM1} - ${p.NUM2})`, cs: p => `(${p.NUM1} - ${p.NUM2})`, py: p => `(${p.NUM1} - ${p.NUM2})` }
-  },
-  operator_multiply: {
-    cat: 'operators', shape: 'reporter', label: '{NUM1} * {NUM2}',
-    params: { NUM1: { type: 'num', val: '6' }, NUM2: { type: 'num', val: '7' } },
-    concept: '算術乘法運算子，程式語言一律使用星號 * 代表乘號（避免與英文字母 x 混淆）。',
-    tip: '初學者常誤打成英文 x，記得在程式裡乘號是 * ！',
-    code: { cpp: p => `(${p.NUM1} * ${p.NUM2})`, cs: p => `(${p.NUM1} * ${p.NUM2})`, py: p => `(${p.NUM1} * ${p.NUM2})` }
-  },
-  operator_divide: {
-    cat: 'operators', shape: 'reporter', label: '{NUM1} / {NUM2}',
-    params: { NUM1: { type: 'num', val: '10' }, NUM2: { type: 'num', val: '2' } },
-    concept: '算術除法運算子，程式語言一律使用斜線 / 代表除號。',
-    tip: '重要陷阱：在 C++ 與 C# 中，兩個整數相除（如 5 / 2）會無條件捨去小數得到 2；Python 的 / 則會得到 2.5（若要整數除法用 //）。',
-    code: { cpp: p => `((double)${p.NUM1} / ${p.NUM2})`, cs: p => `((double)${p.NUM1} / ${p.NUM2})`, py: p => `(${p.NUM1} / ${p.NUM2})` }
-  },
-  operator_random: {
-    cat: 'operators', shape: 'reporter', label: '在 {FROM} 到 {TO} 之間取隨機數',
-    params: { FROM: { type: 'num', val: '1' }, TO: { type: 'num', val: '10' } },
-    concept: '產生指定範圍 [min, max] 內的隨機亂數。',
-    tip: '注意範圍邊界：C# 的 rnd.Next(1, 11) 是「含下界、不含上界」，所以最大值要 +1；Python 的 random.randint(1, 10) 則包含 10！',
-    code: {
-      cpp: p => `(${p.FROM} + rand() % (${p.TO} - ${p.FROM} + 1))`,
-      cs: p => `rnd.Next(${p.FROM}, ${p.TO} + 1)`,
-      py: p => `random.randint(${p.FROM}, ${p.TO})`
-    }
-  },
-  operator_gt: {
-    cat: 'operators', shape: 'boolean', label: '{OPERAND1} > {OPERAND2}',
-    params: { OPERAND1: { type: 'text', val: 'score' }, OPERAND2: { type: 'num', val: '50' } },
-    concept: '關係比較運算子（大於），回傳 true 或 false。',
-    tip: '六角形積木代表「布林表達式」，常放進「如果...那麼」的凹槽中。',
-    code: { cpp: p => `(${p.OPERAND1} > ${p.OPERAND2})`, cs: p => `(${p.OPERAND1} > ${p.OPERAND2})`, py: p => `(${p.OPERAND1} > ${p.OPERAND2})` }
-  },
-  operator_lt: {
-    cat: 'operators', shape: 'boolean', label: '{OPERAND1} < {OPERAND2}',
-    params: { OPERAND1: { type: 'text', val: 'score' }, OPERAND2: { type: 'num', val: '50' } },
-    concept: '關係比較運算子（小於），回傳 true 或 false。',
-    tip: '若要判斷「小於或等於」，在程式中寫成 <= 。',
-    code: { cpp: p => `(${p.OPERAND1} < ${p.OPERAND2})`, cs: p => `(${p.OPERAND1} < ${p.OPERAND2})`, py: p => `(${p.OPERAND1} < ${p.OPERAND2})` }
-  },
-  operator_equals: {
-    cat: 'operators', shape: 'boolean', label: '{OPERAND1} = {OPERAND2}',
-    params: { OPERAND1: { type: 'text', val: 'score' }, OPERAND2: { type: 'num', val: '50' } },
-    concept: '相等比較運算子：在文字型語言中必須寫成「兩個等號 ==」！',
-    tip: '全場最高頻錯誤：單等號 = 是「把右邊存進左邊（賦值）」，雙等號 == 才是「檢查左右是否相等」！',
-    code: { cpp: p => `(${p.OPERAND1} == ${p.OPERAND2})`, cs: p => `(${p.OPERAND1} == ${p.OPERAND2})`, py: p => `(${p.OPERAND1} == ${p.OPERAND2})` }
-  },
-  operator_and: {
-    cat: 'operators', shape: 'boolean', label: '{OP1} 且 {OP2}',
-    params: { OP1: { type: 'text', val: 'cond1' }, OP2: { type: 'text', val: 'cond2' } },
-    concept: '邏輯「且（AND）」運算：左右兩個條件都必須成立，整體結果才為真。',
-    tip: 'C++ 與 C# 使用符號 &&；Python 直接使用英文單字 and，非常直覺！',
-    code: { cpp: p => `(${p.OP1} && ${p.OP2})`, cs: p => `(${p.OP1} && ${p.OP2})`, py: p => `(${p.OP1} and ${p.OP2})` }
-  },
-  operator_or: {
-    cat: 'operators', shape: 'boolean', label: '{OP1} 或 {OP2}',
-    params: { OP1: { type: 'text', val: 'cond1' }, OP2: { type: 'text', val: 'cond2' } },
-    concept: '邏輯「或（OR）」運算：左右只要有其中一個條件成立，整體結果就為真。',
-    tip: 'C++ 與 C# 使用兩條直線 ||（通常在 Enter 鍵上方）；Python 直接寫 or。',
-    code: { cpp: p => `(${p.OP1} || ${p.OP2})`, cs: p => `(${p.OP1} || ${p.OP2})`, py: p => `(${p.OP1} or ${p.OP2})` }
-  },
-  operator_not: {
-    cat: 'operators', shape: 'boolean', label: '{OP} 不成立',
-    params: { OP: { type: 'text', val: 'cond' } },
-    concept: '邏輯「非（NOT）」運算：把 true 變成 false，把 false 變成 true。',
-    tip: 'C++ 與 C# 在條件前面加驚嘆號 !；Python 在前面加單字 not。',
-    code: { cpp: p => `(!${p.OP})`, cs: p => `(!${p.OP})`, py: p => `(not ${p.OP})` }
-  },
-  operator_join: {
-    cat: 'operators', shape: 'reporter', label: '字串組合 {STRING1} {STRING2}',
-    params: { STRING1: { type: 'text', val: 'apple ' }, STRING2: { type: 'text', val: 'banana' } },
-    concept: '字串串接（String Concatenation）：把兩段文字接成同一段文字。',
-    tip: '三大語言都可以直接用 + 號把兩個字串連接在一起！',
-    code: {
-      cpp: p => `(std::string("${p.STRING1}") + "${p.STRING2}")`,
-      cs: p => `("${p.STRING1}" + "${p.STRING2}")`,
-      py: p => `("${p.STRING1}" + "${p.STRING2}")`
-    }
-  },
-  operator_letter_of: {
-    cat: 'operators', shape: 'reporter', label: '字串 {STRING} 的第 {LETTER} 字',
-    params: { STRING: { type: 'text', val: 'apple' }, LETTER: { type: 'num', val: '1' } },
-    concept: '透過索引（Index）取得字串中的單一字元。',
-    tip: '關鍵差異：Scratch 第 1 個字是 1，但 C++、C#、Python 的字串第 1 個字索引都是 [0]（所以要減 1）！',
-    code: {
-      cpp: p => `std::string("${p.STRING}")[${p.LETTER} - 1]`,
-      cs: p => `"${p.STRING}"[${p.LETTER} - 1]`,
-      py: p => `"${p.STRING}"[${p.LETTER} - 1]`
-    }
-  },
-  operator_length: {
-    cat: 'operators', shape: 'reporter', label: '字串 {STRING} 的長度',
-    params: { STRING: { type: 'text', val: 'apple' } },
-    concept: '計算字串包含幾個字元。',
-    tip: 'C++ 用 .length()、C# 用 .Length 屬性、Python 用內建函式 len()。',
-    code: {
-      cpp: p => `std::string("${p.STRING}").length()`,
-      cs: p => `"${p.STRING}".Length`,
-      py: p => `len("${p.STRING}")`
-    }
-  },
-  operator_contains: {
-    cat: 'operators', shape: 'boolean', label: '字串 {STRING1} 包含 {STRING2} ？',
-    params: { STRING1: { type: 'text', val: 'apple' }, STRING2: { type: 'text', val: 'a' } },
-    concept: '子字串搜尋（Substring Search），檢查一段文字內是否出現指定的關鍵字。',
-    tip: 'Python 的 "a" in "apple" 語法簡潔如英文句子；C# 使用 .Contains()。',
-    code: {
-      cpp: p => `(std::string("${p.STRING1}").find("${p.STRING2}") != std::string::npos)`,
-      cs: p => `"${p.STRING1}".Contains("${p.STRING2}")`,
-      py: p => `("${p.STRING2}" in "${p.STRING1}")`
-    }
-  },
-  operator_mod: {
-    cat: 'operators', shape: 'reporter', label: '{NUM1} 除以 {NUM2} 的餘數',
-    params: { NUM1: { type: 'num', val: '10' }, NUM2: { type: 'num', val: '3' } },
-    concept: '取餘數運算子（Modulo），在所有程式語言中都使用百分比符號 % 表示！',
-    tip: '餘數超級實用：x % 2 == 0 可以判斷偶數，time % 60 可以換算秒數！',
-    code: { cpp: p => `(${p.NUM1} % ${p.NUM2})`, cs: p => `(${p.NUM1} % ${p.NUM2})`, py: p => `(${p.NUM1} % ${p.NUM2})` }
-  },
-  operator_round: {
-    cat: 'operators', shape: 'reporter', label: '四捨五入數值 {NUM}',
-    params: { NUM: { type: 'num', val: '3.6' } },
-    concept: '呼叫數學函式庫的四捨五入函式 round()。',
-    tip: 'C++ 與 Python 函式名是小寫 round()；C# 遵循大駝峰命名法，寫作 Math.Round()。',
-    code: {
-      cpp: p => `std::round(${p.NUM})`,
-      cs: p => `Math.Round(${p.NUM})`,
-      py: p => `round(${p.NUM})`
-    }
-  },
+  operator_add: { cat: 'operators', shape: 'reporter', label: '{NUM1} + {NUM2}', params: { NUM1: { type: 'num', val: '3' }, NUM2: { type: 'num', val: '5' } }, concept: '算術加法。', tip: '兩側為字串時可能變成字串串接。', code: { cpp: p => `(${p.NUM1} + ${p.NUM2})`, cs: p => `(${p.NUM1} + ${p.NUM2})`, py: p => `(${p.NUM1} + ${p.NUM2})` } },
+  operator_subtract: { cat: 'operators', shape: 'reporter', label: '{NUM1} - {NUM2}', params: { NUM1: { type: 'num', val: '10' }, NUM2: { type: 'num', val: '4' } }, concept: '算術減法。', tip: '與一般減法相同。', code: { cpp: p => `(${p.NUM1} - ${p.NUM2})`, cs: p => `(${p.NUM1} - ${p.NUM2})`, py: p => `(${p.NUM1} - ${p.NUM2})` } },
+  operator_multiply: { cat: 'operators', shape: 'reporter', label: '{NUM1} * {NUM2}', params: { NUM1: { type: 'num', val: '6' }, NUM2: { type: 'num', val: '7' } }, concept: '算術乘法，使用星號 *。', tip: '不要打成英文字母 x。', code: { cpp: p => `(${p.NUM1} * ${p.NUM2})`, cs: p => `(${p.NUM1} * ${p.NUM2})`, py: p => `(${p.NUM1} * ${p.NUM2})` } },
+  operator_divide: { cat: 'operators', shape: 'reporter', label: '{NUM1} / {NUM2}', params: { NUM1: { type: 'num', val: '10' }, NUM2: { type: 'num', val: '2' } }, concept: '算術除法，使用斜線 /。', tip: 'C++/C# 整數相除會捨去小數。', code: { cpp: p => `((double)${p.NUM1} / ${p.NUM2})`, cs: p => `((double)${p.NUM1} / ${p.NUM2})`, py: p => `(${p.NUM1} / ${p.NUM2})` } },
+  operator_random: { cat: 'operators', shape: 'reporter', label: '在 {FROM} 到 {TO} 之間取隨機數', params: { FROM: { type: 'num', val: '1' }, TO: { type: 'num', val: '10' } }, concept: '產生指定區間內的隨機數。', tip: 'C# Next(min, max+1) 上界不包含。', code: { cpp: p => `(${p.FROM} + rand() % (${p.TO} - ${p.FROM} + 1))`, cs: p => `rnd.Next(${p.FROM}, ${p.TO} + 1)`, py: p => `random.randint(${p.FROM}, ${p.TO})` } },
+  operator_gt: { cat: 'operators', shape: 'boolean', label: '{OPERAND1} > {OPERAND2}', params: { OPERAND1: { type: 'text', val: 'score' }, OPERAND2: { type: 'num', val: '50' } }, concept: '大於比較（回傳布林值）。', tip: '可拖入「如果」的六角形條件槽。', code: { cpp: p => `(${p.OPERAND1} > ${p.OPERAND2})`, cs: p => `(${p.OPERAND1} > ${p.OPERAND2})`, py: p => `(${p.OPERAND1} > ${p.OPERAND2})` } },
+  operator_lt: { cat: 'operators', shape: 'boolean', label: '{OPERAND1} < {OPERAND2}', params: { OPERAND1: { type: 'text', val: 'score' }, OPERAND2: { type: 'num', val: '50' } }, concept: '小於比較（回傳布林值）。', tip: '小於等於寫作 <=。', code: { cpp: p => `(${p.OPERAND1} < ${p.OPERAND2})`, cs: p => `(${p.OPERAND1} < ${p.OPERAND2})`, py: p => `(${p.OPERAND1} < ${p.OPERAND2})` } },
+  operator_equals: { cat: 'operators', shape: 'boolean', label: '{OPERAND1} = {OPERAND2}', params: { OPERAND1: { type: 'text', val: 'score' }, OPERAND2: { type: 'num', val: '50' } }, concept: '相等比較：文字語言寫作 ==。', tip: '一個等號 = 是賦值，兩個等號 == 才是比較。', code: { cpp: p => `(${p.OPERAND1} == ${p.OPERAND2})`, cs: p => `(${p.OPERAND1} == ${p.OPERAND2})`, py: p => `(${p.OPERAND1} == ${p.OPERAND2})` } },
+  operator_and: { cat: 'operators', shape: 'boolean', label: '{OP1} 且 {OP2}', params: { OP1: { type: 'text', val: 'cond1' }, OP2: { type: 'text', val: 'cond2' } }, concept: '邏輯且（AND）：兩邊皆成立才為真。', tip: 'C++/C# 用 &&，Python 用 and。', code: { cpp: p => `(${p.OP1} && ${p.OP2})`, cs: p => `(${p.OP1} && ${p.OP2})`, py: p => `(${p.OP1} and ${p.OP2})` } },
+  operator_or: { cat: 'operators', shape: 'boolean', label: '{OP1} 或 {OP2}', params: { OP1: { type: 'text', val: 'cond1' }, OP2: { type: 'text', val: 'cond2' } }, concept: '邏輯或（OR）：任一邊成立即為真。', tip: 'C++/C# 用 ||，Python 用 or。', code: { cpp: p => `(${p.OP1} || ${p.OP2})`, cs: p => `(${p.OP1} || ${p.OP2})`, py: p => `(${p.OP1} or ${p.OP2})` } },
+  operator_not: { cat: 'operators', shape: 'boolean', label: '{OP} 不成立', params: { OP: { type: 'text', val: 'cond' } }, concept: '邏輯非（NOT）：布林值反轉。', tip: 'C++/C# 用 !，Python 用 not。', code: { cpp: p => `(!${p.OP})`, cs: p => `(!${p.OP})`, py: p => `(not ${p.OP})` } },
+  operator_join: { cat: 'operators', shape: 'reporter', label: '字串組合 {STRING1} {STRING2}', params: { STRING1: { type: 'text', val: 'apple ' }, STRING2: { type: 'text', val: 'banana' } }, concept: '將兩段字串連接在一起。', tip: '三種語言皆可用 + 串接字串。', code: { cpp: p => `(string("${p.STRING1}") + "${p.STRING2}")`, cs: p => `("${p.STRING1}" + "${p.STRING2}")`, py: p => `("${p.STRING1}" + "${p.STRING2}")` } },
+  operator_letter_of: { cat: 'operators', shape: 'reporter', label: '字串 {STRING} 的第 {LETTER} 字', params: { STRING: { type: 'text', val: 'apple' }, LETTER: { type: 'num', val: '1' } }, concept: '取得字串中指定位置的字元。', tip: '字串索引從 0 開始，第 1 字對應 [0]。', code: { cpp: p => `string("${p.STRING}")[${p.LETTER} - 1]`, cs: p => `"${p.STRING}"[${p.LETTER} - 1]`, py: p => `"${p.STRING}"[${p.LETTER} - 1]` } },
+  operator_length: { cat: 'operators', shape: 'reporter', label: '字串 {STRING} 的長度', params: { STRING: { type: 'text', val: 'apple' } }, concept: '取得字串字元數。', tip: 'Python 用 len()，C# 用 .Length。', code: { cpp: p => `string("${p.STRING}").length()`, cs: p => `"${p.STRING}".Length`, py: p => `len("${p.STRING}")` } },
+  operator_contains: { cat: 'operators', shape: 'boolean', label: '字串 {STRING1} 包含 {STRING2} ？', params: { STRING1: { type: 'text', val: 'apple' }, STRING2: { type: 'text', val: 'a' } }, concept: '檢查字串是否包含子字串。', tip: 'Python 用 in 關鍵字。', code: { cpp: p => `(string("${p.STRING1}").find("${p.STRING2}") != string::npos)`, cs: p => `"${p.STRING1}".Contains("${p.STRING2}")`, py: p => `("${p.STRING2}" in "${p.STRING1}")` } },
+  operator_mod: { cat: 'operators', shape: 'reporter', label: '{NUM1} 除以 {NUM2} 的餘數', params: { NUM1: { type: 'num', val: '10' }, NUM2: { type: 'num', val: '3' } }, concept: '取餘數運算 %。', tip: '常用於判斷奇偶數或週期循環。', code: { cpp: p => `(${p.NUM1} % ${p.NUM2})`, cs: p => `(${p.NUM1} % ${p.NUM2})`, py: p => `(${p.NUM1} % ${p.NUM2})` } },
+  operator_round: { cat: 'operators', shape: 'reporter', label: '四捨五入數值 {NUM}', params: { NUM: { type: 'num', val: '3.6' } }, concept: '四捨五入取整數。', tip: 'C# 為 Math.Round()，Python 為 round()。', code: { cpp: p => `round(${p.NUM})`, cs: p => `Math.Round(${p.NUM})`, py: p => `round(${p.NUM})` } },
   operator_mathop: {
     cat: 'operators', shape: 'reporter', label: '{OPERATOR} 數值 {NUM}',
-    params: {
-      OPERATOR: {
-        type: 'select', val: 'abs',
-        options: [['abs', '絕對值'], ['floor', '無條件捨去'], ['ceiling', '無條件進位'], ['sqrt', '平方根'], ['sin', 'sin'], ['cos', 'cos']]
-      },
-      NUM: { type: 'num', val: '-5' }
-    },
-    concept: '呼叫標準數學函式庫（<cmath> / System.Math / math）中的進階數學運算。',
-    tip: '工程與遊戲開發大量依賴 abs（絕對值）、floor（地板函數）與 sqrt（開根號）。',
+    params: { OPERATOR: { type: 'select', val: 'abs', options: [['abs', '絕對值'], ['floor', '無條件捨去'], ['ceiling', '無條件進位'], ['sqrt', '平方根'], ['sin', 'sin'], ['cos', 'cos']] }, NUM: { type: 'num', val: '-5' } },
+    concept: '呼叫數學函式庫進行絕對值、開根號或三角運算。',
+    tip: '需引入數學函式庫（<cmath> / System.Math / math）。',
     code: {
-      cpp: p => `std::${p.OPERATOR === 'ceiling' ? 'ceil' : p.OPERATOR}(${p.NUM})`,
+      cpp: p => `${p.OPERATOR === 'ceiling' ? 'ceil' : p.OPERATOR}(${p.NUM})`,
       cs: p => `Math.${p.OPERATOR === 'abs' ? 'Abs' : p.OPERATOR === 'floor' ? 'Floor' : p.OPERATOR === 'ceiling' ? 'Ceiling' : p.OPERATOR === 'sqrt' ? 'Sqrt' : p.OPERATOR === 'sin' ? 'Sin' : 'Cos'}(${p.NUM})`,
       py: p => p.OPERATOR === 'abs' ? `abs(${p.NUM})` : `math.${p.OPERATOR === 'ceiling' ? 'ceil' : p.OPERATOR}(${p.NUM})`
     }
   },
 
-  // === VARIABLES (變數) ===
-  data_variable: {
-    cat: 'variables', shape: 'reporter', label: '{VAR}',
-    params: { VAR: { type: 'text', val: 'my_variable' } },
-    concept: '讀取變數記憶體空間裡儲存的數值。',
-    tip: '變數名稱不能包含空白，通常會用底線（my_variable）或駝峰命名（myVariable）。',
-    code: { cpp: p => `${p.VAR}`, cs: p => `${p.VAR}`, py: p => `${p.VAR}` }
-  },
-  data_setvariableto: {
-    cat: 'variables', shape: 'stack', label: '變數 {VAR} 設為 {VALUE}',
-    params: { VAR: { type: 'text', val: 'my_variable' }, VALUE: { type: 'num', val: '0' } },
-    concept: '變數賦值（Assignment）：將右邊的數值存進左邊的變數盒子中。',
-    tip: 'C++ 與 C# 是「強型別語言」，第一次建立變數時必須在前面寫出型別（如 int 或 double）；Python 則直接賦值即可。',
-    code: {
-      cpp: p => `int ${p.VAR} = ${p.VALUE};`,
-      cs: p => `int ${p.VAR} = ${p.VALUE};`,
-      py: p => `${p.VAR} = ${p.VALUE}`
-    }
-  },
-  data_changevariableby: {
-    cat: 'variables', shape: 'stack', label: '變數 {VAR} 改變 {VALUE}',
-    params: { VAR: { type: 'text', val: 'my_variable' }, VALUE: { type: 'num', val: '1' } },
-    concept: '複合指定運算（+=）：把變數原本的值加上新數值後，再存回同一個變數。',
-    tip: 'score += 10 完全等價於 score = score + 10，是計分板最常用的寫法！',
-    code: {
-      cpp: p => `${p.VAR} += ${p.VALUE};`,
-      cs: p => `${p.VAR} += ${p.VALUE};`,
-      py: p => `${p.VAR} += ${p.VALUE}`
-    }
-  },
-  data_showvariable: {
-    cat: 'variables', shape: 'stack', label: '顯示變數 {VAR}',
-    params: { VAR: { type: 'text', val: 'my_variable' } },
-    concept: '將變數目前的數值印出到主控台或更新到畫面 UI 標籤上。',
-    tip: '在寫程式除錯（Debug）時，把變數印出來看是最直接的檢查方法！',
-    code: {
-      cpp: p => `std::cout << "${p.VAR} = " << ${p.VAR} << std::endl;`,
-      cs: p => `Console.WriteLine($"${p.VAR} = {${p.VAR}}");`,
-      py: p => `print(f"${p.VAR} = {${p.VAR}}")`
-    }
-  },
-  data_hidevariable: {
-    cat: 'variables', shape: 'stack', label: '隱藏變數 {VAR}',
-    params: { VAR: { type: 'text', val: 'my_variable' } },
-    concept: '隱藏畫面上的變數監看器 UI 元件（變數資料本身仍保留在記憶體中）。',
-    tip: 'UI 顯示與程式內部的資料儲存是分開的。',
-    code: {
-      cpp: p => `ui.hideLabel("${p.VAR}");`,
-      cs: p => `lbl_${p.VAR}.Visible = false;`,
-      py: p => `ui.hide_label("${p.VAR}")`
-    }
-  },
+  data_variable: { cat: 'variables', shape: 'reporter', label: '{VAR}', params: { VAR: { type: 'text', val: 'my_variable' } }, concept: '圓角變數回報積木：讀取變數值。', tip: '變數名稱避免空白。', code: { cpp: p => `${p.VAR}`, cs: p => `${p.VAR}`, py: p => `${p.VAR}` } },
+  data_setvariableto: { cat: 'variables', shape: 'stack', label: '變數 {VAR} 設為 {VALUE}', params: { VAR: { type: 'text', val: 'my_variable' }, VALUE: { type: 'num', val: '0' } }, concept: '設定變數初始值或新數值。', tip: 'C++/C# 宣告變數需指定型別（如 int）。', code: { cpp: p => `int ${p.VAR} = ${p.VALUE};`, cs: p => `int ${p.VAR} = ${p.VALUE};`, py: p => `${p.VAR} = ${p.VALUE}` } },
+  data_changevariableby: { cat: 'variables', shape: 'stack', label: '變數 {VAR} 改變 {VALUE}', params: { VAR: { type: 'text', val: 'my_variable' }, VALUE: { type: 'num', val: '1' } }, concept: '變數累加或累減（+=）。', tip: 'score += 10 等同 score = score + 10。', code: { cpp: p => `${p.VAR} += ${p.VALUE};`, cs: p => `${p.VAR} += ${p.VALUE};`, py: p => `${p.VAR} += ${p.VALUE}` } },
+  data_showvariable: { cat: 'variables', shape: 'stack', label: '顯示變數 {VAR}', params: { VAR: { type: 'text', val: 'my_variable' } }, concept: '印出變數數值。', tip: '除錯時常用來觀察變數變化。', code: { cpp: p => `cout << "${p.VAR} = " << ${p.VAR} << endl;`, cs: p => `Console.WriteLine($"${p.VAR} = {${p.VAR}}");`, py: p => `print(f"${p.VAR} = {${p.VAR}}")` } },
+  data_hidevariable: { cat: 'variables', shape: 'stack', label: '隱藏變數 {VAR}', params: { VAR: { type: 'text', val: 'my_variable' } }, concept: '隱藏變數顯示元件。', tip: '不影響變數記憶體數值。', code: { cpp: p => `hideLabel("${p.VAR}");`, cs: p => `HideLabel("${p.VAR}");`, py: p => `hide_label("${p.VAR}")` } },
 
-  // === LISTS (清單) ===
-  data_listcontents: {
-    cat: 'lists', shape: 'reporter', label: '清單 {LIST}',
-    params: { LIST: { type: 'text', val: 'myList' } },
-    concept: '代表整個動態陣列或串列物件（C++ 的 std::vector、C# 的 List<T>、Python 的 list）。',
-    tip: '清單就像是「可以自動變長或變短的置物櫃」，能一次存放一整排資料！',
-    code: { cpp: p => `${p.LIST}`, cs: p => `${p.LIST}`, py: p => `${p.LIST}` }
-  },
-  data_addtolist: {
-    cat: 'lists', shape: 'stack', label: '添加 {ITEM} 到 {LIST}',
-    params: { ITEM: { type: 'text', val: 'thing' }, LIST: { type: 'text', val: 'myList' } },
-    concept: '在清單的「最尾端」新增一筆資料。',
-    tip: '三大語言的方法名稱要記熟：C++ 是 push_back()、C# 是 Add()、Python 是 append()！',
-    code: {
-      cpp: p => `${p.LIST}.push_back("${p.ITEM}");`,
-      cs: p => `${p.LIST}.Add("${p.ITEM}");`,
-      py: p => `${p.LIST}.append("${p.ITEM}")`
-    }
-  },
-  data_deleteoflist: {
-    cat: 'lists', shape: 'stack', label: '刪除 {LIST} 的第 {INDEX} 項',
-    params: { LIST: { type: 'text', val: 'myList' }, INDEX: { type: 'num', val: '1' } },
-    concept: '移除清單中指定位置的元素，後面的元素會自動往前補位。',
-    tip: '務必注意「0-based 索引」：Scratch 的第 1 項在 C++ / C# / Python 中是第 [0] 項，所以索引要減 1！',
-    code: {
-      cpp: p => `${p.LIST}.erase(${p.LIST}.begin() + (${p.INDEX} - 1));`,
-      cs: p => `${p.LIST}.RemoveAt(${p.INDEX} - 1);`,
-      py: p => `${p.LIST}.pop(${p.INDEX} - 1)`
-    }
-  },
-  data_deletealloflist: {
-    cat: 'lists', shape: 'stack', label: '刪除 {LIST} 的全部項目',
-    params: { LIST: { type: 'text', val: 'myList' } },
-    concept: '一次清空清單內的所有元素，讓清單長度變為 0。',
-    tip: '三種語言都使用 clear() 方法清空串列！',
-    code: {
-      cpp: p => `${p.LIST}.clear();`,
-      cs: p => `${p.LIST}.Clear();`,
-      py: p => `${p.LIST}.clear()`
-    }
-  },
-  data_insertatlist: {
-    cat: 'lists', shape: 'stack', label: '插入 {ITEM} 到 {LIST} 的第 {INDEX} 項',
-    params: { ITEM: { type: 'text', val: 'thing' }, LIST: { type: 'text', val: 'myList' }, INDEX: { type: 'num', val: '1' } },
-    concept: '在清單的指定位置插入新資料，原本該位置與後面的資料會往後順移一格。',
-    tip: '一樣要記得將 Scratch 的編號減 1 轉成 0 起始索引。',
-    code: {
-      cpp: p => `${p.LIST}.insert(${p.LIST}.begin() + (${p.INDEX} - 1), "${p.ITEM}");`,
-      cs: p => `${p.LIST}.Insert(${p.INDEX} - 1, "${p.ITEM}");`,
-      py: p => `${p.LIST}.insert(${p.INDEX} - 1, "${p.ITEM}")`
-    }
-  },
-  data_replaceitemoflist: {
-    cat: 'lists', shape: 'stack', label: '替換 {LIST} 的第 {INDEX} 項為 {ITEM}',
-    params: { LIST: { type: 'text', val: 'myList' }, INDEX: { type: 'num', val: '1' }, ITEM: { type: 'text', val: 'thing' } },
-    concept: '透過中括號索引 [index] 直接修改該格子的內容。',
-    tip: '中括號 [ ] 是所有主流語言存取陣列／清單元素的共通符號！',
-    code: {
-      cpp: p => `${p.LIST}[${p.INDEX} - 1] = "${p.ITEM}";`,
-      cs: p => `${p.LIST}[${p.INDEX} - 1] = "${p.ITEM}";`,
-      py: p => `${p.LIST}[${p.INDEX} - 1] = "${p.ITEM}"`
-    }
-  },
-  data_itemoflist: {
-    cat: 'lists', shape: 'reporter', label: '{LIST} 的第 {INDEX} 項',
-    params: { LIST: { type: 'text', val: 'myList' }, INDEX: { type: 'num', val: '1' } },
-    concept: '讀取清單中指定索引位置的資料內容。',
-    tip: '若索引超出清單目前長度，程式會發生「索引超出範圍（Out of Range）」錯誤。',
-    code: {
-      cpp: p => `${p.LIST}[${p.INDEX} - 1]`,
-      cs: p => `${p.LIST}[${p.INDEX} - 1]`,
-      py: p => `${p.LIST}[${p.INDEX} - 1]`
-    }
-  },
-  data_itemnumoflist: {
-    cat: 'lists', shape: 'reporter', label: '{LIST} 中第一個 {ITEM} 的編號',
-    params: { LIST: { type: 'text', val: 'myList' }, ITEM: { type: 'text', val: 'thing' } },
-    concept: '線性搜尋（Linear Search）：從頭尋找某筆資料出現在第幾個位置。',
-    tip: 'C# 的 IndexOf() 若找不到會回傳 -1；Python 的 index() 找不到則會拋出 ValueError。',
-    code: {
-      cpp: p => `(std::find(${p.LIST}.begin(), ${p.LIST}.end(), "${p.ITEM}") - ${p.LIST}.begin() + 1)`,
-      cs: p => `(${p.LIST}.IndexOf("${p.ITEM}") + 1)`,
-      py: p => `(${p.LIST}.index("${p.ITEM}") + 1)`
-    }
-  },
-  data_lengthoflist: {
-    cat: 'lists', shape: 'reporter', label: '清單 {LIST} 的長度',
-    params: { LIST: { type: 'text', val: 'myList' } },
-    concept: '取得清單目前存放的元素總數量。',
-    tip: '三種語言寫法不同：C++ 是 .size()、C# 是 .Count、Python 是 len()。',
-    code: {
-      cpp: p => `${p.LIST}.size()`,
-      cs: p => `${p.LIST}.Count`,
-      py: p => `len(${p.LIST})`
-    }
-  },
-  data_listcontainsitem: {
-    cat: 'lists', shape: 'boolean', label: '清單 {LIST} 包含 {ITEM} ？',
-    params: { LIST: { type: 'text', val: 'myList' }, ITEM: { type: 'text', val: 'thing' } },
-    concept: '檢查清單內是否存在某個元素，回傳 true 或 false。',
-    tip: '常用於背包系統檢查「玩家是否擁有某把鑰匙」！',
-    code: {
-      cpp: p => `(std::find(${p.LIST}.begin(), ${p.LIST}.end(), "${p.ITEM}") != ${p.LIST}.end())`,
-      cs: p => `${p.LIST}.Contains("${p.ITEM}")`,
-      py: p => `("${p.ITEM}" in ${p.LIST})`
-    }
-  },
-  data_showlist: {
-    cat: 'lists', shape: 'stack', label: '顯示清單 {LIST}',
-    params: { LIST: { type: 'text', val: 'myList' } },
-    concept: '透過迴圈將清單內的每一個元素逐一印出到螢幕上。',
-    tip: '強化迴圈（Range-based for / foreach / for-in）是走訪清單最乾淨的寫法！',
-    code: {
-      cpp: p => `for (const auto& item : ${p.LIST}) std::cout << item << " ";`,
-      cs: p => `Console.WriteLine(string.Join(", ", ${p.LIST}));`,
-      py: p => `print(${p.LIST})`
-    }
-  },
-  data_hidelist: {
-    cat: 'lists', shape: 'stack', label: '隱藏清單 {LIST}',
-    params: { LIST: { type: 'text', val: 'myList' } },
-    concept: '隱藏畫面上顯示清單的 UI 視窗元件。',
-    tip: '資料依然保存在清單變數中，隨時可以讀取。',
-    code: {
-      cpp: p => `ui.hideList("${p.LIST}");`,
-      cs: p => `listBox_${p.LIST}.Visible = false;`,
-      py: p => `ui.hide_list("${p.LIST}")`
-    }
-  },
+  data_listcontents: { cat: 'lists', shape: 'reporter', label: '清單 {LIST}', params: { LIST: { type: 'text', val: 'myList' } }, concept: '代表整個清單／動態陣列。', tip: 'C++ vector、C# List<T>、Python list。', code: { cpp: p => `${p.LIST}`, cs: p => `${p.LIST}`, py: p => `${p.LIST}` } },
+  data_addtolist: { cat: 'lists', shape: 'stack', label: '添加 {ITEM} 到 {LIST}', params: { ITEM: { type: 'text', val: 'thing' }, LIST: { type: 'text', val: 'myList' } }, concept: '在清單尾端新增項目。', tip: 'C++ push_back()、C# Add()、Python append()。', code: { cpp: p => `${p.LIST}.push_back("${p.ITEM}");`, cs: p => `${p.LIST}.Add("${p.ITEM}");`, py: p => `${p.LIST}.append("${p.ITEM}")` } },
+  data_deleteoflist: { cat: 'lists', shape: 'stack', label: '刪除 {LIST} 的第 {INDEX} 項', params: { LIST: { type: 'text', val: 'myList' }, INDEX: { type: 'num', val: '1' } }, concept: '刪除指定索引位置項目。', tip: '注意 0 起始索引（需減 1）。', code: { cpp: p => `${p.LIST}.erase(${p.LIST}.begin() + (${p.INDEX} - 1));`, cs: p => `${p.LIST}.RemoveAt(${p.INDEX} - 1);`, py: p => `${p.LIST}.pop(${p.INDEX} - 1)` } },
+  data_deletealloflist: { cat: 'lists', shape: 'stack', label: '刪除 {LIST} 的全部項目', params: { LIST: { type: 'text', val: 'myList' } }, concept: '清空清單所有項目。', tip: '皆使用 clear()。', code: { cpp: p => `${p.LIST}.clear();`, cs: p => `${p.LIST}.Clear();`, py: p => `${p.LIST}.clear()` } },
+  data_insertatlist: { cat: 'lists', shape: 'stack', label: '插入 {ITEM} 到 {LIST} 的第 {INDEX} 項', params: { ITEM: { type: 'text', val: 'thing' }, LIST: { type: 'text', val: 'myList' }, INDEX: { type: 'num', val: '1' } }, concept: '在指定位置插入新項目。', tip: '後方元素會往後順移。', code: { cpp: p => `${p.LIST}.insert(${p.LIST}.begin() + (${p.INDEX} - 1), "${p.ITEM}");`, cs: p => `${p.LIST}.Insert(${p.INDEX} - 1, "${p.ITEM}");`, py: p => `${p.LIST}.insert(${p.INDEX} - 1, "${p.ITEM}")` } },
+  data_replaceitemoflist: { cat: 'lists', shape: 'stack', label: '替換 {LIST} 的第 {INDEX} 項為 {ITEM}', params: { LIST: { type: 'text', val: 'myList' }, INDEX: { type: 'num', val: '1' }, ITEM: { type: 'text', val: 'thing' } }, concept: '透過索引覆寫指定項目內容。', tip: '使用中括號 [index] 存取。', code: { cpp: p => `${p.LIST}[${p.INDEX} - 1] = "${p.ITEM}";`, cs: p => `${p.LIST}[${p.INDEX} - 1] = "${p.ITEM}";`, py: p => `${p.LIST}[${p.INDEX} - 1] = "${p.ITEM}"` } },
+  data_itemoflist: { cat: 'lists', shape: 'reporter', label: '{LIST} 的第 {INDEX} 項', params: { LIST: { type: 'text', val: 'myList' }, INDEX: { type: 'num', val: '1' } }, concept: '取得清單指定位置的值。', tip: '索引不可超出清單長度。', code: { cpp: p => `${p.LIST}[${p.INDEX} - 1]`, cs: p => `${p.LIST}[${p.INDEX} - 1]`, py: p => `${p.LIST}[${p.INDEX} - 1]` } },
+  data_itemnumoflist: { cat: 'lists', shape: 'reporter', label: '{LIST} 中第一個 {ITEM} 的編號', params: { LIST: { type: 'text', val: 'myList' }, ITEM: { type: 'text', val: 'thing' } }, concept: '搜尋指定項目的位置編號。', tip: 'Scratch 從 1 算起。', code: { cpp: p => `(find(${p.LIST}.begin(), ${p.LIST}.end(), "${p.ITEM}") - ${p.LIST}.begin() + 1)`, cs: p => `(${p.LIST}.IndexOf("${p.ITEM}") + 1)`, py: p => `(${p.LIST}.index("${p.ITEM}") + 1)` } },
+  data_lengthoflist: { cat: 'lists', shape: 'reporter', label: '清單 {LIST} 的長度', params: { LIST: { type: 'text', val: 'myList' } }, concept: '取得清單元素數量。', tip: 'C++ .size()、C# .Count、Python len()。', code: { cpp: p => `${p.LIST}.size()`, cs: p => `${p.LIST}.Count`, py: p => `len(${p.LIST})` } },
+  data_listcontainsitem: { cat: 'lists', shape: 'boolean', label: '清單 {LIST} 包含 {ITEM} ？', params: { LIST: { type: 'text', val: 'myList' }, ITEM: { type: 'text', val: 'thing' } }, concept: '判斷清單是否包含某項目（布林值）。', tip: '回傳 true 或 false。', code: { cpp: p => `(find(${p.LIST}.begin(), ${p.LIST}.end(), "${p.ITEM}") != ${p.LIST}.end())`, cs: p => `${p.LIST}.Contains("${p.ITEM}")`, py: p => `("${p.ITEM}" in ${p.LIST})` } },
+  data_showlist: { cat: 'lists', shape: 'stack', label: '顯示清單 {LIST}', params: { LIST: { type: 'text', val: 'myList' } }, concept: '印出清單內容。', tip: '常用迴圈走訪元素。', code: { cpp: p => `for (const auto& item : ${p.LIST}) cout << item << " ";`, cs: p => `Console.WriteLine(string.Join(", ", ${p.LIST}));`, py: p => `print(${p.LIST})` } },
+  data_hidelist: { cat: 'lists', shape: 'stack', label: '隱藏清單 {LIST}', params: { LIST: { type: 'text', val: 'myList' } }, concept: '隱藏清單顯示元件。', tip: '資料仍保留在清單中。', code: { cpp: p => `hideList("${p.LIST}");`, cs: p => `HideList("${p.LIST}");`, py: p => `hide_list("${p.LIST}")` } },
 
-  // === MY BLOCKS (函式積木) ===
-  procedures_definition_simple: {
-    cat: 'myblocks', shape: 'hat', label: '定義 {NAME}',
-    params: { NAME: { type: 'text', val: 'function1' } },
-    concept: '定義一個無回傳值、無參數的自訂函式（Function / Method），將重複的邏輯打包起來。',
-    tip: 'C++ 與 C# 沒有回傳值的函式前面要寫 void；Python 則統一使用關鍵字 def。',
-    code: {
-      cpp: p => `void ${p.NAME}() {`,
-      cs: p => `void ${p.NAME}() {`,
-      py: p => `def ${p.NAME}():`
-    }
-  },
-  procedures_call_simple: {
-    cat: 'myblocks', shape: 'stack', label: '{NAME}',
-    params: { NAME: { type: 'text', val: 'function1' } },
-    concept: '呼叫（執行）已經定義好的自訂函式，程式會跳過去把函式內容跑完再回來。',
-    tip: '呼叫函式時，函式名稱後面一定要加上小括號 () ！',
-    code: {
-      cpp: p => `${p.NAME}();`,
-      cs: p => `${p.NAME}();`,
-      py: p => `${p.NAME}()`
-    }
-  },
-  procedures_definition_args: {
-    cat: 'myblocks', shape: 'hat', label: '定義 {NAME} (文字/數字:{ARG1}) (布林:{ARG2})',
-    params: { NAME: { type: 'text', val: 'Function2' }, ARG1: { type: 'text', val: 'numOrText' }, ARG2: { type: 'text', val: 'flag' } },
-    concept: '定義帶有參數（Parameters）的函式，讓外部呼叫時可以傳入不同的數值或布林條件。',
-    tip: 'C++ 與 C# 的每個參數都必須標明資料型別（如 string, bool）；Python 則直接寫參數名稱即可。',
-    code: {
-      cpp: p => `void ${p.NAME}(std::string ${p.ARG1}, bool ${p.ARG2}) {`,
-      cs: p => `void ${p.NAME}(string ${p.ARG1}, bool ${p.ARG2}) {`,
-      py: p => `def ${p.NAME}(${p.ARG1}, ${p.ARG2}):`
-    }
-  },
-  procedures_call_args: {
-    cat: 'myblocks', shape: 'stack', label: '{NAME} {VAL1} {VAL2}',
-    params: { NAME: { type: 'text', val: 'Function2' }, VAL1: { type: 'text', val: 'Hello' }, VAL2: { type: 'select', val: 'true', options: [['true', '成立 (true)'], ['false', '不成立 (false)']] } },
-    concept: '呼叫帶參數的函式，並依序填入引數（Arguments）。',
-    tip: '傳入的引數順序與資料型別必須與函式定義時的參數一一對應！',
-    code: {
-      cpp: p => `${p.NAME}("${p.VAL1}", ${p.VAL2});`,
-      cs: p => `${p.NAME}("${p.VAL1}", ${p.VAL2});`,
-      py: p => `${p.NAME}("${p.VAL1}", ${p.VAL2 === 'true' ? 'True' : 'False'})`
-    }
-  }
+  procedures_definition_simple: { cat: 'myblocks', shape: 'hat', label: '定義 {NAME}', params: { NAME: { type: 'text', val: 'function1' } }, concept: '帽型函式定義積木：建立可重複呼叫的函式。', tip: 'C++/C# 用 void，Python 用 def。', code: { cpp: p => `void ${p.NAME}() {`, cs: p => `void ${p.NAME}() {`, py: p => `def ${p.NAME}():` } },
+  procedures_call_simple: { cat: 'myblocks', shape: 'stack', label: '{NAME}', params: { NAME: { type: 'text', val: 'function1' } }, concept: '呼叫自訂函式。', tip: '呼叫時需加上小括號 ()。', code: { cpp: p => `${p.NAME}();`, cs: p => `${p.NAME}();`, py: p => `${p.NAME}()` } },
+  procedures_definition_args: { cat: 'myblocks', shape: 'hat', label: '定義 {NAME} (文字/數字:{ARG1}) (布林:{ARG2})', params: { NAME: { type: 'text', val: 'Function2' }, ARG1: { type: 'text', val: 'numOrText' }, ARG2: { type: 'text', val: 'flag' } }, concept: '定義帶參數的自訂函式。', tip: '參數可接收外部傳入的資料。', code: { cpp: p => `void ${p.NAME}(string ${p.ARG1}, bool ${p.ARG2}) {`, cs: p => `void ${p.NAME}(string ${p.ARG1}, bool ${p.ARG2}) {`, py: p => `def ${p.NAME}(${p.ARG1}, ${p.ARG2}):` } },
+  procedures_call_args: { cat: 'myblocks', shape: 'stack', label: '{NAME} {VAL1} {VAL2}', params: { NAME: { type: 'text', val: 'Function2' }, VAL1: { type: 'text', val: 'Hello' }, VAL2: { type: 'select', val: 'true', options: [['true', '成立 (true)'], ['false', '不成立 (false)']] } }, concept: '呼叫帶參數的函式並傳入引數。', tip: '引數順序須與參數一致。', code: { cpp: p => `${p.NAME}("${p.VAL1}", ${p.VAL2});`, cs: p => `${p.NAME}("${p.VAL1}", ${p.VAL2});`, py: p => `${p.NAME}("${p.VAL1}", ${p.VAL2 === 'true' ? 'True' : 'False'})` } }
 };
 
-// State
 let currentCategory = 'all';
 let currentLang = 'cpp';
 let selectedBlockUid = null;
@@ -2102,17 +1732,9 @@ function createBlockInstance(defId, overrideParams = {}, children = [], elseChil
   for (const k in def.params) {
     params[k] = overrideParams[k] !== undefined ? overrideParams[k] : def.params[k].val;
   }
-  return {
-    uid: 'b_' + (uidCounter++),
-    defId,
-    params,
-    children,
-    elseChildren,
-    boolSlot
-  };
+  return { uid: 'b_' + (uidCounter++), defId, params, children, elseChildren, boolSlot };
 }
 
-// Initialize Category Sidebar
 function renderCategories() {
   const sidebar = document.getElementById('categorySidebar');
   sidebar.innerHTML = CATEGORIES.map(cat => `
@@ -2129,7 +1751,6 @@ function selectCategory(catId) {
   renderPalette();
 }
 
-// Render Left Palette
 function renderPalette() {
   const listEl = document.getElementById('blockList');
   const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
@@ -2153,40 +1774,255 @@ function renderPalette() {
       listEl.appendChild(title);
     }
 
-    const blockEl = document.createElement('div');
-    blockEl.className = `s-block cat-${def.cat} ${def.shape === 'hat' ? 'hat' : def.shape === 'reporter' ? 'reporter' : def.shape === 'boolean' ? 'boolean' : def.shape === 'cap' ? 'cap' : ''}`;
-    blockEl.draggable = true;
-    blockEl.innerHTML = formatPaletteLabel(def);
+    const outer = document.createElement('div');
+    outer.className = 'scratch-block-outer';
+    outer.draggable = true;
+    outer.appendChild(buildAuthenticShapeEl(def, null, true));
 
-    blockEl.addEventListener('dragstart', e => {
+    outer.addEventListener('dragstart', e => {
       e.dataTransfer.setData('text/plain', JSON.stringify({ source: 'palette', defId }));
     });
+    outer.addEventListener('click', () => addBlockToWorkspace(defId));
+    outer.addEventListener('mouseenter', () => showConcept(defId));
 
-    blockEl.addEventListener('click', () => {
-      addBlockToWorkspace(defId);
-    });
-
-    blockEl.addEventListener('mouseenter', () => {
-      showConcept(defId);
-    });
-
-    listEl.appendChild(blockEl);
+    listEl.appendChild(outer);
   });
 }
 
-function formatPaletteLabel(def) {
-  return def.label.replace(/\{([A-Z0-9_]+)\}/g, (_, key) => {
-    const p = def.params[key];
-    if (!p) return '';
-    if (p.type === 'bool') return `<span class="b-slot-bool">條件</span>`;
-    if (p.type === 'select') {
-      const optLabel = p.options.find(o => o[0] === p.val)?.[1] || p.val;
-      return `<span class="b-select">${optLabel} ▾</span>`;
+function buildAuthenticShapeEl(def, node, isPalette) {
+  const colClass = 'col-' + def.cat;
+
+  if (def.shape === 'reporter') {
+    const el = document.createElement('div');
+    el.className = `sb-reporter ${colClass}`;
+    appendLabelParts(el, def, node, isPalette);
+    return el;
+  }
+
+  if (def.shape === 'boolean') {
+    const el = document.createElement('div');
+    el.className = `sb-boolean ${colClass}`;
+    appendLabelParts(el, def, node, isPalette);
+    return el;
+  }
+
+  if (def.shape === 'c-block' || def.shape === 'c-block-else') {
+    const cWrap = document.createElement('div');
+    cWrap.className = 'sb-c-wrap';
+
+    const top = document.createElement('div');
+    top.className = `sb-c-top ${colClass}`;
+    appendLabelParts(top, def, node, isPalette);
+    cWrap.appendChild(top);
+
+    cWrap.appendChild(buildCMouthRow(node, 'children', colClass, isPalette));
+
+    if (def.shape === 'c-block-else') {
+      const mid = document.createElement('div');
+      mid.className = `sb-c-mid ${colClass}`;
+      mid.textContent = def.elseLabel || '否則';
+      cWrap.appendChild(mid);
+
+      cWrap.appendChild(buildCMouthRow(node, 'elseChildren', colClass, isPalette));
     }
-    if (p.type === 'color') {
-      return `<span style="display:inline-block;width:16px;height:16px;border-radius:50%;background:${p.val};border:1.5px solid #fff;"></span>`;
+
+    const bot = document.createElement('div');
+    bot.className = `sb-c-bottom ${colClass}`;
+    cWrap.appendChild(bot);
+
+    return cWrap;
+  }
+
+  const el = document.createElement('div');
+  let cls = `sb-stack ${colClass}`;
+  if (def.shape === 'hat') {
+    cls += ' is-hat has-bottom';
+  } else if (def.shape === 'cap') {
+    cls += ' has-top is-cap';
+  } else {
+    cls += ' has-top has-bottom';
+  }
+  el.className = cls;
+  appendLabelParts(el, def, node, isPalette);
+  return el;
+}
+
+function buildCMouthRow(node, branchKey, colClass, isPalette) {
+  const row = document.createElement('div');
+  row.className = 'sb-c-mouth-row';
+
+  const arm = document.createElement('div');
+  arm.className = `sb-c-arm ${colClass}`;
+
+  const slot = document.createElement('div');
+  slot.className = 'sb-c-slot';
+
+  if (!isPalette && node) {
+    slot.addEventListener('dragover', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      slot.classList.add('drag-over');
+    });
+    slot.addEventListener('dragleave', e => {
+      e.stopPropagation();
+      slot.classList.remove('drag-over');
+    });
+    slot.addEventListener('drop', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      slot.classList.remove('drag-over');
+      handleDropIntoList(e, node[branchKey]);
+    });
+
+    if (node[branchKey].length === 0) {
+      const ph = document.createElement('div');
+      ph.className = 'drop-placeholder';
+      ph.textContent = '拖曳積木至此凹槽...';
+      slot.appendChild(ph);
+    } else {
+      node[branchKey].forEach(child => {
+        slot.appendChild(renderWorkspaceNode(child));
+      });
     }
-    return `<span class="b-input">${p.val}</span>`;
+  } else {
+    const ph = document.createElement('div');
+    ph.className = 'drop-placeholder';
+    ph.textContent = '凹槽';
+    slot.appendChild(ph);
+  }
+
+  row.appendChild(arm);
+  row.appendChild(slot);
+  return row;
+}
+
+function appendLabelParts(container, def, node, isPalette) {
+  const parts = def.label.split(/(\{[A-Z0-9_]+\})/g);
+  parts.forEach(part => {
+    const match = part.match(/^\{([A-Z0-9_]+)\}$/);
+    if (!match) {
+      if (part) {
+        const span = document.createElement('span');
+        span.textContent = part;
+        container.appendChild(span);
+      }
+      return;
+    }
+
+    const key = match[1];
+    const pDef = def.params[key];
+    if (!pDef) return;
+
+    if (pDef.type === 'bool') {
+      const bSlot = document.createElement('div');
+      bSlot.className = 'b-slot-bool';
+      if (!isPalette && node) {
+        bSlot.addEventListener('dragover', e => {
+          e.preventDefault();
+          e.stopPropagation();
+          bSlot.classList.add('drag-over');
+        });
+        bSlot.addEventListener('dragleave', e => {
+          e.stopPropagation();
+          bSlot.classList.remove('drag-over');
+        });
+        bSlot.addEventListener('drop', e => {
+          e.preventDefault();
+          e.stopPropagation();
+          bSlot.classList.remove('drag-over');
+          try {
+            const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+            if (data.source === 'palette' && BLOCK_DEFS[data.defId]?.shape === 'boolean') {
+              node.boolSlot = createBlockInstance(data.defId);
+              renderAll();
+            }
+          } catch (err) {}
+        });
+
+        if (node.boolSlot) {
+          bSlot.style.background = 'transparent';
+          bSlot.style.padding = '0';
+          const subDef = BLOCK_DEFS[node.boolSlot.defId];
+          const mini = buildAuthenticShapeEl(subDef, node.boolSlot, false);
+          mini.style.transform = 'scale(0.92)';
+          mini.title = '雙擊移除條件積木';
+          mini.addEventListener('dblclick', e => {
+            e.stopPropagation();
+            node.boolSlot = null;
+            renderAll();
+          });
+          bSlot.appendChild(mini);
+        } else {
+          bSlot.textContent = '條件';
+        }
+      } else {
+        bSlot.textContent = '條件';
+      }
+      container.appendChild(bSlot);
+    } else if (pDef.type === 'select') {
+      if (isPalette) {
+        const span = document.createElement('span');
+        span.className = 'b-select';
+        const txt = pDef.options.find(o => o[0] === pDef.val)?.[1] || pDef.val;
+        span.textContent = txt + ' ▾';
+        container.appendChild(span);
+      } else {
+        const sel = document.createElement('select');
+        sel.className = 'b-select';
+        pDef.options.forEach(([val, text]) => {
+          const opt = document.createElement('option');
+          opt.value = val;
+          opt.textContent = text;
+          if (node.params[key] === val) opt.selected = true;
+          sel.appendChild(opt);
+        });
+        sel.addEventListener('click', e => e.stopPropagation());
+        sel.addEventListener('change', e => {
+          node.params[key] = e.target.value;
+          renderCode();
+        });
+        container.appendChild(sel);
+      }
+    } else if (pDef.type === 'color') {
+      const val = isPalette ? pDef.val : node.params[key];
+      if (isPalette) {
+        const dot = document.createElement('span');
+        dot.style.cssText = `display:inline-block;width:15px;height:15px;border-radius:50%;background:${val};border:1.5px solid #fff;`;
+        container.appendChild(dot);
+      } else {
+        const inp = document.createElement('input');
+        inp.type = 'color';
+        inp.value = val;
+        inp.style.cssText = 'width:22px;height:18px;border:none;border-radius:4px;cursor:pointer;';
+        inp.addEventListener('click', e => e.stopPropagation());
+        inp.addEventListener('input', e => {
+          node.params[key] = e.target.value;
+          renderCode();
+        });
+        container.appendChild(inp);
+      }
+    } else {
+      const val = isPalette ? pDef.val : node.params[key];
+      if (isPalette) {
+        const span = document.createElement('span');
+        span.className = 'b-input';
+        span.textContent = val;
+        container.appendChild(span);
+      } else {
+        const inp = document.createElement('input');
+        inp.className = 'b-input';
+        inp.type = 'text';
+        inp.value = val;
+        inp.style.width = Math.max(32, (String(val).length + 2) * 8) + 'px';
+        inp.addEventListener('click', e => e.stopPropagation());
+        inp.addEventListener('input', e => {
+          node.params[key] = e.target.value;
+          inp.style.width = Math.max(32, (e.target.value.length + 2) * 8) + 'px';
+          renderCode();
+        });
+        container.appendChild(inp);
+      }
+    }
   });
 }
 
@@ -2198,302 +2034,98 @@ function addBlockToWorkspace(defId) {
   renderAll();
 }
 
-// Render Center Workspace
 function renderWorkspace() {
   const canvas = document.getElementById('workspaceCanvas');
-  const totalBlocks = countBlocks(workspaceTree);
-  document.getElementById('blockCountLabel').textContent = `${totalBlocks} 個積木`;
+  document.getElementById('blockCountLabel').textContent = `${countBlocks(workspaceTree)} 個積木`;
 
   if (workspaceTree.length === 0) {
     canvas.innerHTML = `
       <div class="workspace-empty">
-        <h3>從左側拖曳或點擊積木開始</h3>
-        <p>支援積木上下排列、控制積木凹槽包覆，以及將布林條件積木嵌入「如果 / 重複直到」的六角形插槽中。</p>
+        <h3>拖曳或點擊原版造型積木開始</h3>
+        <p>支援積木堆疊、C 型控制積木凹槽包覆，以及六角形布林條件嵌入。</p>
       </div>
     `;
     return;
   }
 
   canvas.innerHTML = '';
-  workspaceTree.forEach(node => {
-    canvas.appendChild(renderWorkspaceNode(node));
-  });
+  workspaceTree.forEach(node => canvas.appendChild(renderWorkspaceNode(node)));
 }
 
 function countBlocks(list) {
-  let count = 0;
+  let c = 0;
   for (const item of list) {
-    count += 1;
-    if (item.children) count += countBlocks(item.children);
-    if (item.elseChildren) count += countBlocks(item.elseChildren);
-    if (item.boolSlot) count += 1;
+    c += 1;
+    if (item.children) c += countBlocks(item.children);
+    if (item.elseChildren) c += countBlocks(item.elseChildren);
+    if (item.boolSlot) c += 1;
   }
-  return count;
+  return c;
 }
 
 function renderWorkspaceNode(node) {
   const def = BLOCK_DEFS[node.defId];
-  const wrapper = document.createElement('div');
-  wrapper.className = `ws-item ${selectedBlockUid === node.uid ? 'selected' : ''}`;
-  wrapper.dataset.uid = node.uid;
+  const outer = document.createElement('div');
+  outer.className = `scratch-block-outer ${selectedBlockUid === node.uid ? 'selected' : ''}`;
+  outer.draggable = true;
 
-  wrapper.addEventListener('click', e => {
+  outer.addEventListener('dragstart', e => {
+    e.stopPropagation();
+    e.dataTransfer.setData('text/plain', JSON.stringify({ source: 'workspace', uid: node.uid }));
+  });
+  outer.addEventListener('click', e => {
     e.stopPropagation();
     selectedBlockUid = node.uid;
     showConcept(node.defId);
     renderWorkspace();
     highlightCodeForUid(node.uid);
   });
-
-  wrapper.addEventListener('mouseenter', e => {
+  outer.addEventListener('mouseenter', e => {
     e.stopPropagation();
     highlightCodeForUid(node.uid);
   });
 
-  if (def.shape === 'c-block' || def.shape === 'c-block-else') {
-    const cWrap = document.createElement('div');
-    cWrap.className = 'c-block-wrapper';
+  const row = document.createElement('div');
+  row.className = 'ws-row';
+  row.appendChild(buildAuthenticShapeEl(def, node, false));
 
-    // Top Header
-    const topRow = document.createElement('div');
-    topRow.className = 'ws-block-row';
-    const topBlock = createEditableBlockEl(node, 'c-block-top');
-    topRow.appendChild(topBlock);
-    topRow.appendChild(createDeleteBtn(node.uid));
-    cWrap.appendChild(topRow);
-
-    // Body 1
-    cWrap.appendChild(createCMouth(node, 'children'));
-
-    // Else Middle & Body 2
-    if (def.shape === 'c-block-else') {
-      const mid = document.createElement('div');
-      mid.className = 'c-block-mid';
-      mid.textContent = def.elseLabel || '否則';
-      cWrap.appendChild(mid);
-      cWrap.appendChild(createCMouth(node, 'elseChildren'));
-    }
-
-    // Bottom Cap
-    const bot = document.createElement('div');
-    bot.className = 'c-block-bottom';
-    cWrap.appendChild(bot);
-
-    wrapper.appendChild(cWrap);
-  } else {
-    const row = document.createElement('div');
-    row.className = 'ws-block-row';
-    row.appendChild(createEditableBlockEl(node, ''));
-    row.appendChild(createDeleteBtn(node.uid));
-    wrapper.appendChild(row);
-  }
-
-  return wrapper;
-}
-
-function createCMouth(node, branchKey) {
-  const body = document.createElement('div');
-  body.className = 'c-block-body';
-
-  const spine = document.createElement('div');
-  spine.className = 'c-block-spine';
-
-  const inner = document.createElement('div');
-  inner.className = 'c-block-inner';
-
-  inner.addEventListener('dragover', e => {
-    e.preventDefault();
+  const delBtn = document.createElement('button');
+  delBtn.className = 'del-btn';
+  delBtn.textContent = '✕';
+  delBtn.title = '刪除此積木';
+  delBtn.addEventListener('click', e => {
     e.stopPropagation();
-    inner.classList.add('drag-over');
-  });
-  inner.addEventListener('dragleave', e => {
-    e.stopPropagation();
-    inner.classList.remove('drag-over');
-  });
-  inner.addEventListener('drop', e => {
-    e.preventDefault();
-    e.stopPropagation();
-    inner.classList.remove('drag-over');
-    handleDropIntoList(e, node[branchKey]);
-  });
-
-  if (node[branchKey].length === 0) {
-    const ph = document.createElement('div');
-    ph.className = 'drop-placeholder';
-    ph.textContent = '拖曳積木至此凹槽內...';
-    inner.appendChild(ph);
-  } else {
-    node[branchKey].forEach(child => {
-      inner.appendChild(renderWorkspaceNode(child));
-    });
-  }
-
-  body.appendChild(spine);
-  body.appendChild(inner);
-  return body;
-}
-
-function createEditableBlockEl(node, extraClass) {
-  const def = BLOCK_DEFS[node.defId];
-  const el = document.createElement('div');
-  const shapeCls = def.shape === 'hat' ? 'hat' : def.shape === 'reporter' ? 'reporter' : def.shape === 'boolean' ? 'boolean' : def.shape === 'cap' ? 'cap' : '';
-  el.className = `s-block cat-${def.cat} ${shapeCls} ${extraClass}`;
-  el.draggable = true;
-
-  el.addEventListener('dragstart', e => {
-    e.stopPropagation();
-    e.dataTransfer.setData('text/plain', JSON.stringify({ source: 'workspace', uid: node.uid }));
-  });
-
-  // Build interactive parts
-  const parts = def.label.split(/(\{[A-Z0-9_]+\})/g);
-  parts.forEach(part => {
-    const match = part.match(/^\{([A-Z0-9_]+)\}$/);
-    if (!match) {
-      if (part) {
-        const span = document.createElement('span');
-        span.textContent = part;
-        el.appendChild(span);
-      }
-      return;
-    }
-
-    const key = match[1];
-    const pDef = def.params[key];
-    if (!pDef) return;
-
-    if (pDef.type === 'bool') {
-      const slot = document.createElement('div');
-      slot.className = 'b-slot-bool';
-      slot.addEventListener('dragover', e => {
-        e.preventDefault();
-        e.stopPropagation();
-        slot.classList.add('drag-over');
-      });
-      slot.addEventListener('dragleave', e => {
-        e.stopPropagation();
-        slot.classList.remove('drag-over');
-      });
-      slot.addEventListener('drop', e => {
-        e.preventDefault();
-        e.stopPropagation();
-        slot.classList.remove('drag-over');
-        try {
-          const data = JSON.parse(e.dataTransfer.getData('text/plain'));
-          if (data.source === 'palette') {
-            node.boolSlot = createBlockInstance(data.defId);
-            renderAll();
-          }
-        } catch (err) {}
-      });
-
-      if (node.boolSlot) {
-        const subDef = BLOCK_DEFS[node.boolSlot.defId];
-        slot.style.background = 'transparent';
-        slot.style.border = 'none';
-        slot.style.padding = '0';
-        const mini = createEditableBlockEl(node.boolSlot, '');
-        mini.style.padding = '3px 12px';
-        mini.style.fontSize = '11.5px';
-        mini.title = '雙擊移除條件積木';
-        mini.addEventListener('dblclick', e => {
-          e.stopPropagation();
-          node.boolSlot = null;
-          renderAll();
-        });
-        slot.appendChild(mini);
-      } else {
-        slot.textContent = '拖入條件';
-      }
-      el.appendChild(slot);
-    } else if (pDef.type === 'select') {
-      const sel = document.createElement('select');
-      sel.className = 'b-select';
-      pDef.options.forEach(([val, text]) => {
-        const opt = document.createElement('option');
-        opt.value = val;
-        opt.textContent = text;
-        if (node.params[key] === val) opt.selected = true;
-        sel.appendChild(opt);
-      });
-      sel.addEventListener('click', e => e.stopPropagation());
-      sel.addEventListener('change', e => {
-        node.params[key] = e.target.value;
-        renderCode();
-      });
-      el.appendChild(sel);
-    } else if (pDef.type === 'color') {
-      const inp = document.createElement('input');
-      inp.type = 'color';
-      inp.value = node.params[key];
-      inp.style.width = '24px';
-      inp.style.height = '20px';
-      inp.style.border = 'none';
-      inp.style.borderRadius = '4px';
-      inp.style.cursor = 'pointer';
-      inp.addEventListener('click', e => e.stopPropagation());
-      inp.addEventListener('input', e => {
-        node.params[key] = e.target.value;
-        renderCode();
-      });
-      el.appendChild(inp);
-    } else {
-      const inp = document.createElement('input');
-      inp.className = 'b-input';
-      inp.type = 'text';
-      inp.value = node.params[key];
-      inp.style.width = Math.max(34, (String(node.params[key]).length + 2) * 8) + 'px';
-      inp.addEventListener('click', e => e.stopPropagation());
-      inp.addEventListener('input', e => {
-        node.params[key] = e.target.value;
-        inp.style.width = Math.max(34, (e.target.value.length + 2) * 8) + 'px';
-        renderCode();
-      });
-      el.appendChild(inp);
-    }
-  });
-
-  return el;
-}
-
-function createDeleteBtn(uid) {
-  const btn = document.createElement('button');
-  btn.className = 'del-btn';
-  btn.innerHTML = '✕';
-  btn.title = '刪除此積木';
-  btn.addEventListener('click', e => {
-    e.stopPropagation();
-    removeNodeByUid(workspaceTree, uid);
-    if (selectedBlockUid === uid) selectedBlockUid = null;
+    removeNodeByUid(workspaceTree, node.uid);
+    if (selectedBlockUid === node.uid) selectedBlockUid = null;
     renderAll();
   });
-  return btn;
+  row.appendChild(delBtn);
+
+  outer.appendChild(row);
+  return outer;
 }
 
 function removeNodeByUid(list, uid) {
   for (let i = 0; i < list.length; i++) {
-    if (list[i].uid === uid) {
-      return list.splice(i, 1)[0];
-    }
+    if (list[i].uid === uid) return list.splice(i, 1)[0];
     if (list[i].children) {
-      const found = removeNodeByUid(list[i].children, uid);
-      if (found) return found;
+      const f = removeNodeByUid(list[i].children, uid);
+      if (f) return f;
     }
     if (list[i].elseChildren) {
-      const found = removeNodeByUid(list[i].elseChildren, uid);
-      if (found) return found;
+      const f = removeNodeByUid(list[i].elseChildren, uid);
+      if (f) return f;
     }
   }
   return null;
 }
 
-// Drag & Drop Handlers
 function handleCanvasDragOver(e) {
   e.preventDefault();
   document.getElementById('workspaceCanvas').classList.add('drag-over');
 }
 
-function handleCanvasDragLeave(e) {
+function handleCanvasDragLeave() {
   document.getElementById('workspaceCanvas').classList.remove('drag-over');
 }
 
@@ -2522,7 +2154,6 @@ function handleDropIntoList(e, targetList) {
   } catch (err) {}
 }
 
-// Code Generation Engine
 function setLanguage(lang) {
   currentLang = lang;
   ['cpp', 'cs', 'py'].forEach(l => {
@@ -2535,107 +2166,161 @@ function generateLines() {
   const lines = [];
   const lang = currentLang;
 
-  if (workspaceTree.length === 0) {
-    if (lang === 'cpp') {
-      lines.push({ text: '// 請從左側拖曳或點擊積木，即時產生 C++ 程式碼', uid: null });
-      lines.push({ text: '#include <iostream>', uid: null });
-      lines.push({ text: 'int main() {', uid: null });
-      lines.push({ text: '    return 0;', uid: null });
-      lines.push({ text: '}', uid: null });
-    } else if (lang === 'cs') {
-      lines.push({ text: '// 請從左側拖曳或點擊積木，即時產生 C# 程式碼', uid: null });
-      lines.push({ text: 'using System;', uid: null });
-      lines.push({ text: 'class Program {', uid: null });
-      lines.push({ text: '    static void Main() { }', uid: null });
-      lines.push({ text: '}', uid: null });
-    } else {
-      lines.push({ text: '# 請從左側拖曳或點擊積木，即時產生 Python 程式碼', uid: null });
-      lines.push({ text: 'print("Ready!")', uid: null });
-    }
-    return lines;
-  }
-
-  let hasOpenHat = false;
-
-  function emitList(nodes, indentLevel) {
+  function emitList(nodes, indentLevel, targetLines) {
     const pad = '    '.repeat(indentLevel);
     nodes.forEach(node => {
       const def = BLOCK_DEFS[node.defId];
       let condCode = null;
       if (node.boolSlot) {
-        const subDef = BLOCK_DEFS[node.boolSlot.defId];
-        condCode = subDef.code[lang](node.boolSlot.params);
+        condCode = BLOCK_DEFS[node.boolSlot.defId].code[lang](node.boolSlot.params);
       }
 
-      if (def.shape === 'hat') {
-        if (hasOpenHat && (lang === 'cpp' || lang === 'cs')) {
-          lines.push({ text: '}', uid: null });
-          lines.push({ text: '', uid: null });
-        }
-        hasOpenHat = true;
-        lines.push({ text: def.code[lang](node.params), uid: node.uid });
-      } else if (def.shape === 'c-block') {
+      if (def.shape === 'c-block') {
         const [head, tail] = def.code[lang](node.params, condCode);
-        lines.push({ text: pad + head, uid: node.uid });
+        targetLines.push({ text: pad + head, uid: node.uid });
         if (node.children.length === 0) {
-          lines.push({ text: pad + '    ' + (lang === 'py' ? 'pass' : '// 空區塊'), uid: node.uid });
+          targetLines.push({ text: pad + '    ' + (lang === 'py' ? 'pass' : '// 空區塊'), uid: node.uid });
         } else {
-          emitList(node.children, indentLevel + 1);
+          emitList(node.children, indentLevel + 1, targetLines);
         }
-        if (tail) lines.push({ text: pad + tail, uid: node.uid });
+        if (tail) targetLines.push({ text: pad + tail, uid: node.uid });
       } else if (def.shape === 'c-block-else') {
         const [head, mid, tail] = def.code[lang](node.params, condCode);
-        lines.push({ text: pad + head, uid: node.uid });
+        targetLines.push({ text: pad + head, uid: node.uid });
         if (node.children.length === 0) {
-          lines.push({ text: pad + '    ' + (lang === 'py' ? 'pass' : '// 條件成立區塊'), uid: node.uid });
+          targetLines.push({ text: pad + '    ' + (lang === 'py' ? 'pass' : '// 條件成立區塊'), uid: node.uid });
         } else {
-          emitList(node.children, indentLevel + 1);
+          emitList(node.children, indentLevel + 1, targetLines);
         }
-        lines.push({ text: pad + mid, uid: node.uid });
+        targetLines.push({ text: pad + mid, uid: node.uid });
         if (node.elseChildren.length === 0) {
-          lines.push({ text: pad + '    ' + (lang === 'py' ? 'pass' : '// 否則區塊'), uid: node.uid });
+          targetLines.push({ text: pad + '    ' + (lang === 'py' ? 'pass' : '// 否則區塊'), uid: node.uid });
         } else {
-          emitList(node.elseChildren, indentLevel + 1);
+          emitList(node.elseChildren, indentLevel + 1, targetLines);
         }
-        if (tail) lines.push({ text: pad + tail, uid: node.uid });
+        if (tail) targetLines.push({ text: pad + tail, uid: node.uid });
       } else if (def.shape === 'reporter' || def.shape === 'boolean') {
         const expr = def.code[lang](node.params);
         const stmt = lang === 'cpp'
-          ? `std::cout << (${expr}) << std::endl; // 回報值演示`
+          ? `cout << (${expr}) << endl;`
           : lang === 'cs'
-          ? `Console.WriteLine(${expr}); // 回報值演示`
-          : `print(${expr}) # 回報值演示`;
-        lines.push({ text: pad + stmt, uid: node.uid });
+          ? `Console.WriteLine(${expr});`
+          : `print(${expr})`;
+        targetLines.push({ text: pad + stmt, uid: node.uid });
       } else {
-        lines.push({ text: pad + def.code[lang](node.params), uid: node.uid });
+        targetLines.push({ text: pad + def.code[lang](node.params), uid: node.uid });
       }
     });
   }
 
-  const baseIndent = BLOCK_DEFS[workspaceTree[0].defId].shape === 'hat' ? 1 : 0;
-  emitList(workspaceTree, baseIndent);
+  const mainNodes = [];
+  const extraHats = [];
+  let flagNodeUid = null;
+  let currentTarget = mainNodes;
 
-  if (hasOpenHat && (lang === 'cpp' || lang === 'cs')) {
-    if (BLOCK_DEFS[workspaceTree[0].defId].code[lang]({}).includes('main()')) {
-      lines.push({ text: '    return 0;', uid: null });
+  workspaceTree.forEach(node => {
+    const def = BLOCK_DEFS[node.defId];
+    if (def.shape === 'hat') {
+      if (node.defId === 'event_whenflagclicked') {
+        flagNodeUid = node.uid;
+        currentTarget = mainNodes;
+      } else {
+        const hatGroup = { hat: node, body: [] };
+        extraHats.push(hatGroup);
+        currentTarget = hatGroup.body;
+      }
+    } else {
+      currentTarget.push(node);
     }
+  });
+
+  if (lang === 'cpp') {
+    lines.push({ text: '#include <iostream>', uid: null });
+    lines.push({ text: '', uid: null });
+
+    extraHats.forEach(group => {
+      const hatDef = BLOCK_DEFS[group.hat.defId];
+      lines.push({ text: hatDef.code.cpp(group.hat.params), uid: group.hat.uid });
+      emitList(group.body, 1, lines);
+      lines.push({ text: '}', uid: group.hat.uid });
+      lines.push({ text: '', uid: null });
+    });
+
+    lines.push({ text: 'int main() {', uid: flagNodeUid });
+    if (mainNodes.length === 0) {
+      lines.push({ text: '  ', uid: null });
+    } else {
+      emitList(mainNodes, 1, lines);
+    }
+    lines.push({ text: '    return 0;', uid: null });
+    lines.push({ text: '}', uid: flagNodeUid });
+  } else if (lang === 'cs') {
+    lines.push({ text: 'using System;', uid: null });
+    lines.push({ text: '', uid: null });
+    lines.push({ text: 'public class HelloWorld {', uid: null });
+
+    extraHats.forEach(group => {
+      const hatDef = BLOCK_DEFS[group.hat.defId];
+      lines.push({ text: '    static ' + hatDef.code.cs(group.hat.params), uid: group.hat.uid });
+      emitList(group.body, 2, lines);
+      lines.push({ text: '    }', uid: group.hat.uid });
+      lines.push({ text: '', uid: null });
+    });
+
+    lines.push({ text: '    public static void Main(string[] args) {', uid: flagNodeUid });
+    if (mainNodes.length === 0) {
+      lines.push({ text: '        ', uid: null });
+    } else {
+      emitList(mainNodes, 2, lines);
+    }
+    lines.push({ text: '    }', uid: flagNodeUid });
     lines.push({ text: '}', uid: null });
+  } else {
+    extraHats.forEach(group => {
+      const hatDef = BLOCK_DEFS[group.hat.defId];
+      lines.push({ text: hatDef.code.py(group.hat.params), uid: group.hat.uid });
+      if (group.body.length === 0) {
+        lines.push({ text: '    pass', uid: group.hat.uid });
+      } else {
+        emitList(group.body, 1, lines);
+      }
+      lines.push({ text: '', uid: null });
+    });
+
+    if (mainNodes.length === 0 && extraHats.length === 0) {
+      lines.push({ text: '', uid: null });
+    } else {
+      emitList(mainNodes, 0, lines);
+    }
   }
 
   return lines;
 }
 
 function syntaxHighlight(code) {
-  let esc = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  // Comments
-  esc = esc.replace(/(\/\/.*$|#.*$)/g, '<span class="tok-com">$1</span>');
-  // Strings
-  esc = esc.replace(/(".*?")/g, '<span class="tok-str">$1</span>');
-  // Keywords
-  esc = esc.replace(/\b(if|else|while|for|return|void|int|float|double|bool|string|true|false|True|False|def|in|and|or|not|pass|await|async|new|public|static|class|using|namespace)\b/g, '<span class="tok-kw">$1</span>');
-  // Types / Std
-  esc = esc.replace(/\b(std|cout|endl|Math|Console|Thread|DateTime|Environment|Random|List|vector)\b/g, '<span class="tok-type">$1</span>');
-  return esc;
+  const escapeHtml = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  // 單次掃描：每段文字只會被分類一次，避免後面的規則去比對前面產生的 <span> 標籤
+  const tokenRe = new RegExp(
+    '(\\/\\/.*$|#.*$)' +                                   // 1: 註解
+    '|(".*?")' +                                           // 2: 字串
+    '|\\b(if|else|while|for|return|void|int|float|double|bool|string|true|false|True|False|def|in|and|or|not|pass|await|async|new|using|public|class|static)\\b' + // 3: 關鍵字
+    '|\\b(cout|endl|Math|Console|Thread|DateTime|Environment)\\b', // 4: 型別／物件
+    'g'
+  );
+  let result = '';
+  let last = 0;
+  let m;
+  while ((m = tokenRe.exec(code)) !== null) {
+    result += escapeHtml(code.slice(last, m.index));
+    const cls = m[1] !== undefined ? 'tok-com'
+              : m[2] !== undefined ? 'tok-str'
+              : m[3] !== undefined ? 'tok-kw'
+              : 'tok-type';
+    result += '<span class="' + cls + '">' + escapeHtml(m[0]) + '</span>';
+    last = m.index + m[0].length;
+  }
+  result += escapeHtml(code.slice(last));
+  return result;
 }
 
 function renderCode() {
@@ -2660,10 +2345,9 @@ function copyCode() {
   navigator.clipboard.writeText(lines);
   const btn = document.getElementById('copyBtn');
   btn.textContent = '已複製！';
-  setTimeout(() => { btn.textContent = '複製程式碼'; }, 1500);
+  setTimeout(() => { btn.textContent = '複製'; }, 1500);
 }
 
-// Concept Explanation Card
 function showConcept(defId) {
   const def = BLOCK_DEFS[defId];
   if (!def) return;
@@ -2674,7 +2358,6 @@ function showConcept(defId) {
   document.getElementById('conceptTip').textContent = '教學重點：' + def.tip;
 }
 
-// Presets for Classroom Demo
 function loadPreset(name) {
   workspaceTree = [];
   if (name === 'ifElse') {
@@ -2738,10 +2421,9 @@ function renderAll() {
   renderCode();
 }
 
-// Init
 renderCategories();
 renderPalette();
-loadPreset('ifElse');
+clearWorkspace();
 </script>
 </body>
 </html>
