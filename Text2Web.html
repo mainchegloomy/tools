@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML 網頁原始碼自動存檔工具</title>
+    <style>
+        body {
+            font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+            background-color: #0f172a; /* 深色背景，更有寫程式的專業感 */
+            color: #f8fafc;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: #1e293b;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        h2 {
+            color: #38bdf8;
+            margin-top: 0;
+            margin-bottom: 8px;
+            font-size: 24px;
+        }
+
+        p.hint {
+            color: #94a3b8;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        label {
+            font-weight: 600;
+            color: #cbd5e1;
+            display: block;
+            margin-bottom: 12px;
+        }
+
+        /* 適合放程式碼的文字框 */
+        textarea {
+            width: 100%;
+            height: 350px;
+            padding: 15px;
+            border: 1px solid #475569;
+            border-radius: 10px;
+            box-sizing: border-box;
+            font-size: 14px;
+            font-family: 'Consolas', 'Courier New', monospace; /* 程式碼專用等寬字型 */
+            background-color: #0f172a;
+            color: #38bdf8; /* 科技感藍綠色字體 */
+            resize: vertical;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+        }
+
+        /* 按鈕樣式 */
+        .download-btn {
+            background-color: #0ea5e9;
+            color: white;
+            border: none;
+            padding: 16px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+        }
+
+        .download-btn:hover {
+            background-color: #0284c7;
+        }
+
+        .download-btn:active {
+            transform: scale(0.99);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🛠️ HTML 網頁原始碼自動存檔工具</h2>
+    <p class="hint">請在下方貼上您完整的 HTML 程式碼（包含 &lt;html&gt;、&lt;script&gt; 等標籤），按下按鈕即可直接下載為獨立網頁。</p>
+    
+    <label for="codeBox">請貼上您的網頁原始碼：</label>
+    <textarea id="codeBox" placeholder="請在此處貼上您寫好的完整網頁程式碼..."></textarea>
+    
+    <button class="download-btn" onclick="saveCodeAsHtml()">💾 點擊下載並儲存網頁檔 (.html)</button>
+</div>
+
+<script>
+function saveCodeAsHtml() {
+    // 1. 抓取文字框內的所有程式碼字串（100%原封不動抓取）
+    const rawCode = document.getElementById('codeBox').value;
+
+    // 2. 防呆機制
+    if (!rawCode.trim()) {
+        alert("請先貼上網頁原始碼喔！");
+        return;
+    }
+
+    // 3. 自動幫您抓取貼進去的原始碼裡面的 <title> 標籤內容來當檔名
+    // 例如您貼的程式碼裡面有 <title>陣列奇偶數處理練習</title>，它就會抓到這幾個字
+    let fileName = "index";
+    const titleMatch = rawCode.match(/<title>(.*?)<\/title>/i);
+    if (titleMatch && titleMatch[1]) {
+        // 過濾掉不允許的檔案特殊符號
+        fileName = titleMatch[1].replace(/[\\/:*?"<>|]/g, "").trim();
+    }
+
+    // 4. 【關鍵改動】將原本的程式碼，原汁原味轉化為瀏覽器可讀取的 HTML 檔案
+    // 不再用任何模板去包裝它，而是「直接」把它轉成純粹的 text/html 數據
+    const blob = new Blob([rawCode], { type: 'text/html;charset=utf-8;' });
+    
+    // 5. 觸發瀏覽器下載
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `${fileName}.html`; // 以您貼的程式碼標題來命名
+    link.style.display = "none";
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+</script>
+
+</body>
+</html>

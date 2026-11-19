@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小白板</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background-color: #000000;
+            font-family: Arial, sans-serif;
+        }
+
+        .toolbar {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 10px 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 95%;
+            max-width: 1400px;
+            box-sizing: border-box;
+        }
+
+        .tool-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .color-palette {
+            display: flex;
+            gap: 6px;
+        }
+
+        .color-swatch {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 2px solid #ddd;
+            transition: transform 0.1s;
+            flex-shrink: 0;
+        }
+
+        .color-swatch:hover, .color-swatch.active {
+            transform: scale(1.1);
+            border-color: #333;
+        }
+
+        button {
+            padding: 6px 10px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        button.active {
+            background-color: #333;
+            color: #fff;
+            border-color: #333;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        #clearBtn {
+            background-color: #ffebee;
+            color: #c62828;
+            border-color: #ef9a9a;
+        }
+        #clearBtn:hover:not(:disabled) {
+            background-color: #ffcdd2;
+        }
+
+        input[type="color"], input[type="number"], select, input[type="range"] {
+            padding: 2px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            height: 30px;
+            box-sizing: border-box;
+        }
+
+        input[type="number"] {
+            width: 50px;
+        }
+
+        input[type="range"] {
+            width: 70px;
+            vertical-align: middle;
+        }
+
+        @media (max-width: 768px) {
+            .toolbar {
+                top: 5px;
+                width: 98%;
+                padding: 6px 8px;
+                gap: 6px;
+                justify-content: space-between;
+            }
+
+            .tool-group {
+                gap: 4px;
+                font-size: 12px;
+            }
+
+            .color-palette {
+                gap: 3px;
+                max-width: 120px;
+                overflow-x: auto;
+                padding-bottom: 2px;
+            }
+
+            .color-swatch {
+                width: 18px;
+                height: 18px;
+            }
+
+            button {
+                padding: 4px 6px;
+                font-size: 12px;
+            }
+
+            input[type="color"] { width: 28px; height: 26px; }
+            input[type="number"] { width: 40px; height: 26px; }
+            select { height: 26px; font-size: 12px; }
+        }
+
+        .canvas-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        canvas {
+            display: block;
+            background-color: #ffffff;
+            touch-action: none;
+        }
+
+        #brushCursor {
+            position: absolute;
+            border: 1.5px solid rgba(0, 0, 0, 0.6);
+            background-color: rgba(0, 0, 0, 0.05);
+            border-radius: 50%;
+            pointer-events: none; 
+            transform: translate(-50%, -50%);
+            display: none; 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="toolbar">
+        <div class="tool-group">
+            <button id="brushBtn" class="active" onclick="setMode('brush')">畫筆</button>
+            <button id="eraserBtn" onclick="setMode('eraser')">橡皮擦</button>
+            <select id="shapeSelect" onchange="setMode(this.value)">
+                <option value="" disabled selected hidden>選擇圖形</option>
+                <option value="line">直線</option>
+                <option value="rect">矩形</option>
+                <option value="ellipse">橢圓形</option>
+                <option value="circle">圓形</option>
+                <option value="triangle">三角形</option>
+            </select>
+        </div>
+        <div class="tool-group">
+            <label><input type="checkbox" id="fillCheckbox"> 填滿</label>
+        </div>
+
+        <!-- 色彩 -->
+        <div class="tool-group">
+            <span>色彩：</span>
+            <div class="color-palette">
+                <div class="color-swatch active" style="background-color: #000000;" onclick="setColor('#000000')"></div>
+                <div class="color-swatch" style="background-color: #e74c3c;" onclick="setColor('#e74c3c')"></div>
+                <div class="color-swatch" style="background-color: #e67e22;" onclick="setColor('#e67e22')"></div>
+                <div class="color-swatch" style="background-color: #f1c40f;" onclick="setColor('#f1c40f')"></div>
+                <div class="color-swatch" style="background-color: #2ecc71;" onclick="setColor('#2ecc71')"></div>
+                <div class="color-swatch" style="background-color: #3498db;" onclick="setColor('#3498db')"></div>
+                <div class="color-swatch" style="background-color: #9b59b6;" onclick="setColor('#9b59b6')"></div>
+                <div class="color-swatch" style="background-color: #ffffff; border: 2px solid #999;" onclick="setColor('#ffffff')"></div>
+            </div>
+            <input type="color" id="colorPicker" value="#000000" oninput="setColor(this.value)">
+        </div>
+        <div class="tool-group">
+            <label for="opacityInput">不透明度：</label>
+            <input type="range" id="opacityInput" min="0.1" max="1" step="0.05" value="1" oninput="setOpacity(this.value)">
+            <span id="opacityValue">100%</span>
+        </div>
+
+        <!-- 大小 -->
+        <div class="tool-group">
+            <label for="lineWidthInput">大小：</label>
+            <input type="number" id="lineWidthInput" value="4" min="1" max="100" onchange="setLineWidth(this.value)">
+        </div>
+
+        <!-- 上一步 / 下一步 / 清空 -->
+        <div class="tool-group">
+            <button id="undoBtn" onclick="undo()" disabled>上一步</button>
+            <button id="redoBtn" onclick="redo()" disabled>下一步</button>
+            <button id="clearBtn" onclick="clearCanvas()">清空</button>
+        </div>
+    </div>
+
+    <div class="canvas-container" id="canvasContainer">
+        <canvas id="myCanvas"></canvas>
+        <div id="brushCursor"></div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('myCanvas');
+        const ctx = canvas.getContext('2d');
+        const brushCursor = document.getElementById('brushCursor');
+
+        let isDrawing = false;
+        let currentMode = 'brush'; 
+        let currentColor = '#000000';
+        let currentOpacity = 1;
+        
+        let brushWidth = 4;  
+        let eraserWidth = 40; 
+        let currentLineWidth = brushWidth; 
+
+        let startX = 0;
+        let startY = 0;
+        let snapshot = null; 
+
+        // 歷史紀錄相關變數
+        let historyStack = [];
+        let historyStep = -1;
+
+        function initCanvasSize() {
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCanvas.width = canvas.width;
+            tempCanvas.height = canvas.height;
+            if (canvas.width > 0 && canvas.height > 0) {
+                tempCtx.drawImage(canvas, 0, 0);
+            }
+
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.lineWidth = currentLineWidth;
+            if (tempCanvas.width > 0 && tempCanvas.height > 0) {
+                ctx.drawImage(tempCanvas, 0, 0);
+            }
+        }
+
+        initCanvasSize();
+
+        // 儲存初始空白狀態
+        saveState();
+
+        window.addEventListener('resize', () => {
+            initCanvasSize();
+        });
+
+        function saveState() {
+            // 如果目前不是在歷史紀錄的最頂端，切換動作時要將後續的未來紀錄清空
+            if (historyStep < historyStack.length - 1) {
+                historyStack = historyStack.slice(0, historyStep + 1);
+            }
+            historyStack.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+            historyStep++;
+            updateUndoRedoButtons();
+        }
+
+        function undo() {
+            if (historyStep > 0) {
+                historyStep--;
+                ctx.putImageData(historyStack[historyStep], 0, 0);
+                updateUndoRedoButtons();
+            }
+        }
+
+        function redo() {
+            if (historyStep < historyStack.length - 1) {
+                historyStep++;
+                ctx.putImageData(historyStack[historyStep], 0, 0);
+                updateUndoRedoButtons();
+            }
+        }
+
+        function updateUndoRedoButtons() {
+            document.getElementById('undoBtn').disabled = historyStep <= 0;
+            document.getElementById('redoBtn').disabled = historyStep >= historyStack.length - 1;
+        }
+
+        function updateCursorStyle() {
+            brushCursor.style.width = currentLineWidth + 'px';
+            brushCursor.style.height = currentLineWidth + 'px';
+            
+            if (currentMode === 'eraser') {
+                brushCursor.style.backgroundColor = 'rgba(255, 255, 255, 0.4)';
+                brushCursor.style.borderColor = 'rgba(0, 0, 0, 0.4)';
+            } else {
+                brushCursor.style.backgroundColor = 'rgba(0, 0, 0, 0.05)';
+                brushCursor.style.borderColor = 'rgba(0, 0, 0, 0.6)';
+            }
+        }
+        updateCursorStyle();
+
+        function setMode(mode) {
+            if (mode === 'eraser') {
+                if (currentMode !== 'eraser') {
+                    if (currentMode === 'brush') brushWidth = currentLineWidth;
+                }
+                currentLineWidth = eraserWidth; 
+            } 
+            else if (mode === 'brush') {
+                if (currentMode === 'eraser') {
+                    eraserWidth = currentLineWidth; 
+                }
+                currentLineWidth = brushWidth; 
+            } 
+            else {
+                if (currentMode === 'eraser') {
+                    eraserWidth = currentLineWidth;
+                } else if (currentMode === 'brush') {
+                    brushWidth = currentLineWidth;
+                }
+                currentLineWidth = brushWidth;
+            }
+
+            document.getElementById('lineWidthInput').value = currentLineWidth;
+            ctx.lineWidth = currentLineWidth;
+
+            currentMode = mode;
+            document.getElementById('brushBtn').classList.toggle('active', mode === 'brush');
+            document.getElementById('eraserBtn').classList.toggle('active', mode === 'eraser');
+            const shapeSelect = document.getElementById('shapeSelect');
+            if (['line', 'rect', 'ellipse', 'circle', 'triangle'].includes(mode)) {
+                shapeSelect.value = mode;
+            } else {
+                shapeSelect.selectedIndex = 0;
+            }
+            
+            updateCursorStyle();
+        }
+
+        function setColor(color) {
+            currentColor = color;
+            document.getElementById('colorPicker').value = color;
+            if (currentMode === 'eraser') setMode('brush');
+
+            document.querySelectorAll('.color-swatch').forEach(swatch => {
+                if (swatch.style.backgroundColor === hexToRgb(color)) {
+                    swatch.classList.add('active');
+                } else {
+                    swatch.classList.remove('active');
+                }
+            });
+        }
+
+        function setOpacity(val) {
+            currentOpacity = parseFloat(val);
+            document.getElementById('opacityValue').innerText = Math.round(currentOpacity * 100) + '%';
+        }
+
+        function getStrokeColor() {
+            if (currentMode === 'eraser') return '#ffffff';
+            return hexToRgba(currentColor, currentOpacity);
+        }
+
+        function setLineWidth(width) {
+            currentLineWidth = Math.max(1, parseInt(width) || 1);
+            document.getElementById('lineWidthInput').value = currentLineWidth;
+            ctx.lineWidth = currentLineWidth;
+            
+            if (currentMode === 'eraser') {
+                eraserWidth = currentLineWidth;
+            } else {
+                brushWidth = currentLineWidth;
+            }
+            
+            updateCursorStyle();
+        }
+
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            saveState();
+        }
+
+        function hexToRgb(hex) {
+            let shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+            hex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
+            let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? `rgb(${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)})` : null;
+        }
+
+        function hexToRgba(hex, alpha) {
+            let shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+            hex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
+            let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? `rgba(${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}, ${alpha})` : hex;
+        }
+
+        function getMousePos(event) {
+            const clientX = event.clientX || (event.touches && event.touches[0].clientX);
+            const clientY = event.clientY || (event.touches && event.touches[0].clientY);
+            return { x: clientX, y: clientY };
+        }
+
+        function startDrawing(e) {
+            isDrawing = true;
+            const { x, y } = getMousePos(e);
+            startX = x;
+            startY = y;
+
+            ctx.strokeStyle = getStrokeColor();
+            ctx.fillStyle = getStrokeColor();
+            ctx.lineWidth = currentLineWidth;
+
+            if (currentMode === 'brush' || currentMode === 'eraser') {
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+            } else {
+                snapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            }
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            const { x, y } = getMousePos(e);
+
+            if (currentMode === 'brush' || currentMode === 'eraser') {
+                ctx.lineTo(x, y);
+                ctx.stroke();
+            } else {
+                ctx.putImageData(snapshot, 0, 0);
+                
+                const isFilled = document.getElementById('fillCheckbox').checked;
+                ctx.beginPath();
+
+                if (currentMode === 'line') {
+                    ctx.moveTo(startX, startY);
+                    ctx.lineTo(x, y);
+                    ctx.stroke();
+                } 
+                else if (currentMode === 'rect') {
+                    const width = x - startX;
+                    const height = y - startY;
+                    if (isFilled) ctx.fillRect(startX, startY, width, height);
+                    ctx.strokeRect(startX, startY, width, height);
+                } 
+                else if (currentMode === 'ellipse') {
+                    const radiusX = Math.abs(x - startX) / 2;
+                    const radiusY = Math.abs(y - startY) / 2;
+                    const centerX = Math.min(startX, x) + radiusX;
+                    const centerY = Math.min(startY, y) + radiusY;
+                    ctx.ellipse(centerX, centerY, radiusX, radiusY, 0, 0, 2 * Math.PI);
+                    if (isFilled) ctx.fill();
+                    ctx.stroke();
+                } 
+                else if (currentMode === 'circle') {
+                    const radius = Math.sqrt(Math.pow(x - startX, 2) + Math.pow(y - startY, 2));
+                    ctx.arc(startX, startY, radius, 0, 2 * Math.PI);
+                    if (isFilled) ctx.fill();
+                    ctx.stroke();
+                } 
+                else if (currentMode === 'triangle') {
+                    ctx.moveTo(startX + (x - startX) / 2, startY); // 頂點
+                    ctx.lineTo(startX, y);                       // 左下
+                    ctx.lineTo(x, y);                             // 右下
+                    ctx.closePath();
+                    if (isFilled) ctx.fill();
+                    ctx.stroke();
+                }
+            }
+        }
+
+        function stopDrawing() {
+            if (isDrawing) {
+                isDrawing = false;
+                saveState(); // 繪製結束後儲存一次狀態
+            }
+        }
+
+        canvas.addEventListener('mouseenter', () => { brushCursor.style.display = 'block'; });
+        canvas.addEventListener('mouseleave', () => { 
+            brushCursor.style.display = 'none'; 
+            if (isDrawing) {
+                isDrawing = false;
+                saveState();
+            }
+        });
+        canvas.addEventListener('mousemove', (event) => {
+            brushCursor.style.left = event.clientX + 'px';
+            brushCursor.style.top = event.clientY + 'px';
+            draw(event);
+        });
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('touchstart', (event) => {
+            event.preventDefault();
+            startDrawing(event);
+        });
+        canvas.addEventListener('touchmove', (event) => {
+            event.preventDefault();
+            draw(event);
+        });
+        canvas.addEventListener('touchend', stopDrawing);
+    </script>
+</body>
+</html>
