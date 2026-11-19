@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Scratch 積木 → C++ / C# / Python 演示</title>
+<title>Scratch 原版積木造型 → C++ / C# / Python 互動教學演示平台</title>
 <style>
   :root {
     --bg-dark: #0f172a;
@@ -790,6 +790,97 @@
     font-size: 12px;
     border-radius: 0 4px 4px 0;
   }
+  /* ===== RWD ===== */
+  html { -webkit-text-size-adjust: 100%; }
+  body { height: 100vh; height: 100dvh; }
+  .mobile-tabs { display: none; }
+  .scratch-block-outer, .scratch-block-outer * { -webkit-touch-callout: none; }
+  .touch-ghost {
+    position: fixed; z-index: 9999; pointer-events: none; opacity: 0.85;
+    transform: translate(-12px, -12px); filter: drop-shadow(0 6px 10px rgba(0,0,0,0.5));
+  }
+  .touch-ghost .scratch-block-outer { filter: none; }
+  .slot-target { outline: 2px dashed #facc15 !important; outline-offset: 2px; }
+  .toast {
+    position: fixed; left: 50%; bottom: 76px; transform: translateX(-50%);
+    background: #0b1120; color: #fff; border: 1px solid var(--accent);
+    padding: 8px 14px; border-radius: 20px; font-size: 13px; z-index: 10000;
+    opacity: 0; transition: opacity .2s; pointer-events: none; max-width: 90vw; text-align: center;
+  }
+  .toast.show { opacity: 1; }
+
+  /* 平板 / 小筆電 */
+  @media (max-width: 1180px) {
+    .main-container { grid-template-columns: 300px 1fr 360px; }
+    .brand p { display: none; }
+    .brand h1 { font-size: 15px; }
+  }
+
+  /* 手機與直式平板：單欄 + 底部分頁 */
+  @media (max-width: 860px) {
+    header { flex-direction: column; align-items: stretch; gap: 8px; padding: 8px 12px; }
+    .brand { gap: 8px; }
+    .brand-badge { font-size: 11px; padding: 4px 8px; }
+    .brand h1 { font-size: 14px; line-height: 1.3; }
+    .preset-bar { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 2px; }
+    .preset-bar .btn, .preset-label { flex-shrink: 0; white-space: nowrap; }
+    .btn { padding: 8px 12px; font-size: 13px; }
+
+    .main-container { display: block; position: relative; flex: 1; min-height: 0; }
+    .main-container > section { position: absolute; inset: 0; display: none; border: none; }
+    .main-container > section.mobile-active { display: flex; }
+
+    /* 積木區：分類改為上方橫向捲動列 */
+    .palette-body { flex-direction: column; }
+    .category-sidebar {
+      width: 100%; flex-direction: row; overflow-x: auto; overflow-y: hidden;
+      border-right: none; border-bottom: 1px solid var(--border-color); padding: 6px;
+    }
+    .cat-btn { flex-direction: row; flex-shrink: 0; padding: 8px 12px; font-size: 13px; white-space: nowrap; }
+    .search-box input { font-size: 16px; } /* 避免 iOS 聚焦時自動放大 */
+
+    .workspace-canvas { padding: 12px; overflow: auto; }
+    .pane-header { padding: 8px 12px; flex-wrap: wrap; gap: 4px; }
+    .pane-header .pane-subtitle:first-child, .pane-header > span > .pane-subtitle { display: none; }
+    .workspace-empty { padding: 24px 16px; max-width: 90%; }
+    .del-btn { width: 30px; height: 30px; font-size: 14px; opacity: 1; }
+
+    .code-viewer { font-size: 12.5px; }
+    .concept-card { max-height: 34vh; }
+    .lang-btn { padding: 10px 8px; }
+    .copy-btn { padding: 10px 12px; }
+
+    .scratch-block-outer { touch-action: pan-y; }
+
+    .mobile-tabs {
+      display: flex; flex-shrink: 0; background: #0b1120; border-top: 1px solid var(--border-color);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    .mobile-tabs button {
+      flex: 1; background: transparent; border: none; color: var(--text-muted);
+      padding: 10px 4px 9px; font-size: 12px; display: flex; flex-direction: column;
+      align-items: center; gap: 2px; cursor: pointer;
+    }
+    .mobile-tabs button .ico { font-size: 18px; line-height: 1; }
+    .mobile-tabs button.active { color: var(--accent); font-weight: 700; background: rgba(56,189,248,0.1); }
+    .mobile-tabs .badge {
+      background: var(--accent); color: #0f172a; border-radius: 9px; font-size: 10px;
+      padding: 0 6px; margin-left: 4px; font-weight: 700;
+    }
+  }
+
+  /* 極小螢幕 */
+  @media (max-width: 380px) {
+    .brand h1 { font-size: 13px; }
+    .mobile-tabs button { font-size: 11px; }
+  }
+
+  /* 手機橫向：矮螢幕時縮小標題列 */
+  @media (max-height: 480px) and (max-width: 860px) {
+    header { flex-direction: row; align-items: center; }
+    .brand h1 { display: none; }
+    .concept-card { max-height: 40vh; }
+  }
 </style>
 </head>
 <body>
@@ -798,12 +889,12 @@
   <div class="brand">
     <div class="brand-badge">SCRATCH 3.0</div>
     <div>
-      <h1>Scratch 積木 → C++ / C# / Python 演示</h1>
-      <p>使用 Scratch 3.0 積木官方色票</p>
+      <h1>Scratch 原版積木造型 → C++ / C# / Python 互動教學演示</h1>
+      <p>採用原版 Scratch 3.0 積木輪廓（凹槽、凸榫、帽型、C型口、六角形、圓角）與官方色票</p>
     </div>
   </div>
   <div class="preset-bar">
-    <span class="preset-label">範例：</span>
+    <span class="preset-label">課堂範例：</span>
     <button class="btn" onclick="loadPreset('ifElse')">分支判斷</button>
     <button class="btn" onclick="loadPreset('loopSum')">迴圈累加</button>
     <button class="btn" onclick="loadPreset('listDemo')">清單操作</button>
@@ -813,7 +904,7 @@
 </header>
 
 <div class="main-container">
-  <section class="palette-pane">
+  <section class="palette-pane" id="pane-palette">
     <div class="search-box">
       <input type="text" id="searchInput" placeholder="搜尋積木（分身、隨機、清單、移動、如果）..." oninput="renderPalette()">
     </div>
@@ -823,7 +914,7 @@
     </div>
   </section>
 
-  <section class="workspace-pane">
+  <section class="workspace-pane" id="pane-workspace">
     <div class="pane-header">
       <span>積木程式堆積區 <span class="pane-subtitle">（拖曳至畫布或 C 型積木凹槽內，點擊積木查看解說）</span></span>
       <span class="pane-subtitle" id="blockCountLabel">0 個積木</span>
@@ -835,7 +926,7 @@
     </div>
   </section>
 
-  <section class="code-pane">
+  <section class="code-pane" id="pane-code">
     <div class="lang-tabs">
       <button class="lang-btn active" id="btn-cpp" onclick="setLanguage('cpp')">C++</button>
       <button class="lang-btn" id="btn-cs" onclick="setLanguage('cs')">C#</button>
@@ -857,6 +948,14 @@
     </div>
   </section>
 </div>
+
+<nav class="mobile-tabs" id="mobileTabs">
+  <button data-pane="palette" onclick="showPane('palette')"><span class="ico">🧩</span><span>積木</span></button>
+  <button data-pane="workspace" onclick="showPane('workspace')"><span class="ico">🛠️</span><span>工作區<span class="badge" id="tabBadge">0</span></span></button>
+  <button data-pane="code" onclick="showPane('code')"><span class="ico">💻</span><span>程式碼</span></button>
+</nav>
+
+<div class="toast" id="toast"></div>
 
 <script>
 const CATEGORIES = [
@@ -1873,6 +1972,12 @@ function buildCMouthRow(node, branchKey, colClass, isPalette) {
       slot.classList.remove('drag-over');
       handleDropIntoList(e, node[branchKey]);
     });
+    slot.addEventListener('click', e => {
+      if (!isMobileLayout()) return;
+      if (e.target !== slot && !e.target.classList.contains('drop-placeholder')) return;
+      e.stopPropagation();
+      setPendingTarget({ kind: 'list', list: node[branchKey] }, slot);
+    });
 
     if (node[branchKey].length === 0) {
       const ph = document.createElement('div');
@@ -1925,6 +2030,11 @@ function appendLabelParts(container, def, node, isPalette) {
         bSlot.addEventListener('dragleave', e => {
           e.stopPropagation();
           bSlot.classList.remove('drag-over');
+        });
+        bSlot.addEventListener('click', e => {
+          if (!isMobileLayout() || node.boolSlot) return;
+          e.stopPropagation();
+          setPendingTarget({ kind: 'bool', node }, bSlot);
         });
         bSlot.addEventListener('drop', e => {
           e.preventDefault();
@@ -2028,10 +2138,28 @@ function appendLabelParts(container, def, node, isPalette) {
 
 function addBlockToWorkspace(defId) {
   const newNode = createBlockInstance(defId);
-  workspaceTree.push(newNode);
+  let placed = '工作區';
+  if (pendingTarget && pendingTarget.kind === 'bool') {
+    if (BLOCK_DEFS[defId].shape === 'boolean') {
+      pendingTarget.node.boolSlot = newNode;
+      placed = '條件插槽';
+    } else {
+      showToast('這個插槽只能放六角形的布林積木');
+      return;
+    }
+  } else if (pendingTarget && pendingTarget.kind === 'list') {
+    pendingTarget.list.push(newNode);
+    placed = 'C 型凹槽';
+  } else {
+    workspaceTree.push(newNode);
+  }
+  pendingTarget = null;
   selectedBlockUid = newNode.uid;
   showConcept(defId);
   renderAll();
+  if (isMobileLayout()) {
+    showToast('已加入' + placed + '，可切換到「工作區」查看');
+  }
 }
 
 function renderWorkspace() {
@@ -2236,6 +2364,7 @@ function generateLines() {
 
   if (lang === 'cpp') {
     lines.push({ text: '#include <iostream>', uid: null });
+       lines.push({ text: 'using namespace std;', uid: null });
     lines.push({ text: '', uid: null });
 
     extraHats.forEach(group => {
@@ -2417,9 +2546,146 @@ function clearWorkspace() {
 }
 
 function renderAll() {
+  setTimeout(() => { const b = document.getElementById('tabBadge'); const l = document.getElementById('blockCountLabel'); if (b && l) b.textContent = parseInt(l.textContent) || 0; }, 0);
   renderWorkspace();
   renderCode();
 }
+
+
+// ===== RWD / 觸控支援 =====
+let pendingTarget = null;
+function isMobileLayout() { return window.matchMedia('(max-width: 860px)').matches; }
+
+function showPane(name) {
+  ['palette', 'workspace', 'code'].forEach(n => {
+    document.getElementById('pane-' + n).classList.toggle('mobile-active', n === name);
+  });
+  document.querySelectorAll('#mobileTabs button').forEach(b => b.classList.toggle('active', b.dataset.pane === name));
+}
+
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+function setPendingTarget(target, el) {
+  document.querySelectorAll('.slot-target').forEach(x => x.classList.remove('slot-target'));
+  pendingTarget = target;
+  el.classList.add('slot-target');
+  showPane('palette');
+  showToast(target.kind === 'bool' ? '請選擇一個布林積木放入條件插槽' : '請選擇要放入凹槽的積木');
+}
+
+// 點選工作區空白處：取消指定的插槽
+document.addEventListener('click', e => {
+  if (pendingTarget && !e.target.closest('.sb-c-slot, .b-slot-bool, .scratch-block-outer, .mobile-tabs, .search-box, .category-sidebar')) {
+    pendingTarget = null;
+    document.querySelectorAll('.slot-target').forEach(x => x.classList.remove('slot-target'));
+  }
+});
+
+function syncPaneToViewport() {
+  if (isMobileLayout()) {
+    if (!document.querySelector('.main-container > section.mobile-active')) showPane('palette');
+  } else {
+    document.querySelectorAll('.main-container > section').forEach(x => x.classList.remove('mobile-active'));
+  }
+}
+window.addEventListener('resize', syncPaneToViewport);
+syncPaneToViewport();
+
+// 觸控拖曳：讓工作區內的積木可用手指拖進 C 型凹槽 / 條件插槽
+// （HTML5 Drag & Drop 在多數手機瀏覽器不會被觸發，這裡以 touch 事件模擬）
+(function initTouchDrag() {
+  let drag = null;
+  const HOLD_MS = 220, MOVE_PX = 8;
+
+  function makeDT() {
+    const store = {};
+    return { setData: (k, v) => { store[k] = v; }, getData: k => store[k] || '', effectAllowed: 'move', dropEffect: 'move' };
+  }
+  function fire(el, type, dt) {
+    if (!el) return;
+    const ev = new Event(type, { bubbles: true, cancelable: true });
+    ev.dataTransfer = dt;
+    el.dispatchEvent(ev);
+  }
+  function cleanup() {
+    if (!drag) return;
+    clearTimeout(drag.timer);
+    if (drag.ghost) drag.ghost.remove();
+    if (drag.over) fire(drag.over, 'dragleave', drag.dt);
+    document.body.style.overflow = '';
+    drag = null;
+  }
+
+  document.addEventListener('touchstart', e => {
+    if (e.touches.length !== 1) return;
+    if (e.target.closest('input, select, button, textarea')) return;
+    const block = e.target.closest('.scratch-block-outer[draggable="true"]');
+    if (!block) return;
+    // 只對工作區內的積木啟用（積木庫保持點擊加入，才能正常捲動清單）
+    if (!block.closest('#workspaceCanvas')) return;
+    const t = e.touches[0];
+    drag = { block, startX: t.clientX, startY: t.clientY, active: false, over: null, ghost: null, dt: makeDT() };
+    drag.timer = setTimeout(() => {
+      if (!drag) return;
+      drag.active = true;
+      if (navigator.vibrate) navigator.vibrate(15);
+      fire(block, 'dragstart', drag.dt);
+      const g = document.createElement('div');
+      g.className = 'touch-ghost';
+      g.appendChild(block.cloneNode(true));
+      document.body.appendChild(g);
+      drag.ghost = g;
+      g.style.left = drag.startX + 'px';
+      g.style.top = drag.startY + 'px';
+    }, HOLD_MS);
+  }, { passive: true });
+
+  document.addEventListener('touchmove', e => {
+    if (!drag) return;
+    const t = e.touches[0];
+    if (!drag.active) {
+      // 還沒長按就移動 → 視為捲動，取消拖曳
+      if (Math.abs(t.clientX - drag.startX) > MOVE_PX || Math.abs(t.clientY - drag.startY) > MOVE_PX) cleanup();
+      return;
+    }
+    e.preventDefault();
+    drag.ghost.style.left = t.clientX + 'px';
+    drag.ghost.style.top = t.clientY + 'px';
+    drag.ghost.style.display = 'none';
+    const under = document.elementFromPoint(t.clientX, t.clientY);
+    drag.ghost.style.display = '';
+    if (under !== drag.over) {
+      if (drag.over) fire(drag.over, 'dragleave', drag.dt);
+      drag.over = under;
+    }
+    fire(under, 'dragover', drag.dt);
+    // 接近畫面上下緣時自動捲動工作區
+    const canvas = document.getElementById('workspaceCanvas');
+    const r = canvas.getBoundingClientRect();
+    if (t.clientY < r.top + 40) canvas.scrollTop -= 8;
+    else if (t.clientY > r.bottom - 40) canvas.scrollTop += 8;
+  }, { passive: false });
+
+  document.addEventListener('touchend', e => {
+    if (!drag) return;
+    if (drag.active) {
+      const t = e.changedTouches[0];
+      drag.ghost.style.display = 'none';
+      const under = document.elementFromPoint(t.clientX, t.clientY);
+      fire(under, 'drop', drag.dt);
+      e.preventDefault();
+    }
+    cleanup();
+  }, { passive: false });
+  document.addEventListener('touchcancel', cleanup, { passive: true });
+})();
 
 renderCategories();
 renderPalette();
